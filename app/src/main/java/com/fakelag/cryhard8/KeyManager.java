@@ -18,9 +18,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class KeyManager {
-    // LƯU Ý: Đảm bảo đường link này khớp với link Render của bạn
     private static final String BASE_URL = "https://minizo-sevaapi.onrender.com";
-    private static final String APP_SECRET = "APP_SECRET_456"; // Phải khớp với app.py
+    private static final String APP_SECRET = "APP_SECRET_456";
     private static final String PREFS_NAME = "key_prefs";
     private static final String KEY_ACTIVATED = "is_activated";
 
@@ -121,7 +120,7 @@ public class KeyManager {
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     conn.setRequestProperty("X-App-Key", APP_SECRET);
                     conn.setDoOutput(true);
-                    conn.setConnectTimeout(10000); // Timeout ngắn vì chạy ngầm
+                    conn.setConnectTimeout(10000);
                     conn.setReadTimeout(10000);
 
                     JSONObject json = new JSONObject();
@@ -151,5 +150,11 @@ public class KeyManager {
 
     public static boolean isActivated(Context context) {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(KEY_ACTIVATED, false);
+    }
+
+    // === HÀM MỚI: Xóa trạng thái kích hoạt (Dùng khi bị Kick) ===
+    public static void logout(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_ACTIVATED, false).remove("saved_key").apply();
     }
 }
