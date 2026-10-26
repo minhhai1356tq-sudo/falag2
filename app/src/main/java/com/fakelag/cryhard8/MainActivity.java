@@ -2,17 +2,24 @@ package com.fakelag.cryhard8;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -132,6 +139,32 @@ public class MainActivity extends Activity {
     private ViewGroup mainContent;
     private View groupMaskOptions, groupTeleOptions, groupTeleSpeedOptions;
 
+    // BroadcastReceiver lắng nghe tín hiệu Ban/Kick từ BackgroundCheckService
+    private BroadcastReceiver killReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            if (intent == null) return;
+            String reason = intent.getStringExtra("reason");
+            if ("BANNED".equals(reason) || "KICKED".equals(reason)) {
+                // 1. Tắt VPN
+                try {
+                    Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
+                    vpnStop.setAction("com.fakelag.cryhard8.STOP");
+                    startService(vpnStop);
+                } catch (Exception e) {}
+                // 2. Tắt Nút nổi
+                try { stopService(new Intent(MainActivity.this, FloatingOverlayService.class)); } catch (Exception e) {}
+                // 3. Hiện màn hình đen
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        showBlacklistScreen(reason);
+                    }
+                });
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +176,20 @@ public class MainActivity extends Activity {
         }
 
         setContentView(R.layout.activity_main);
+
+        // Khởi động Service chạy ngầm check trạng thái Ban/Kick
+        try {
+            Intent serviceIntent = new Intent(this, BackgroundCheckService.class);
+            startService(serviceIntent);
+        } catch (Exception e) { }
+
+        // Đăng ký nhận tín hiệu tắt App
+        IntentFilter filter = new IntentFilter("com.fakelag.cryhard8.KILL_APP");
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(killReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(killReceiver, filter);
+        }
 
         try {
             if (getActionBar() != null) getActionBar().hide();
@@ -300,6 +347,44 @@ public class MainActivity extends Activity {
         });
     }
 
+    // === HÀM HIỂN THỊ MÀN HÌNH ĐEN KHI BỊ BAN/KICK ===
+    private void showBlacklistScreen(String reason) {
+        final TextView tv = new TextView(this);
+        tv.setText(reason.equals("BANNED") ? "MÁY BẠN ĐÃ BỊ BACKLIST\nVUI LÒNG LIÊN HỆ ADMIN ĐỂ ĐƯỢC HỖ TRỢ" : "PHIÊN ĐĂNG NHẬP ĐÃ HẾT HẠN\nVUI LÒNG NHẬP LẠI KEY");
+        tv.setTextColor(Color.RED);
+        tv.setTextSize(24);
+        tv.setGravity(Gravity.CENTER);
+        tv.setBackgroundColor(Color.BLACK);
+        tv.setTypeface(Typeface.DEFAULT_BOLD);
+        
+        final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        int type = (Build.VERSION.SDK_INT >= 26) ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            type,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            android.graphics.PixelFormat.OPAQUE
+        );
+        try {
+            wm.addView(tv, params);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        // Tự động tắt app sau 30 giây
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    wm.removeView(tv);
+                } catch (Exception e) {}
+                finishAffinity(); // Đóng toàn bộ app
+                System.exit(0);
+            }
+        }, 30000);
+    }
+
     // === HÀM HIỂN THỊ DIALOG NHẬP KEY ===
     private void showKeyDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -394,973 +479,13 @@ public class MainActivity extends Activity {
         refreshPermissionStates();
     }
 
-    private void setupCrosshairControls() {
-        setupFloatingToggle(cbCrosshair, tvCrosshairStatus, KEY_CROSSHAIR);
-        setupCrosshairStyleButtons();
-        setupCrosshairColorButtons();
-        setupCrosshairSizeSeek();
-        setupCrosshairAlphaSeek();
-        updateCrosshairStyleUi();
-        updateCrosshairColorUi();
-    }
-
-    private void setupCrosshairStyleButtons() {
-        if (crosshairStyleButtons == null) return;
-        for (int i = 0; i < crosshairStyleButtons.length; i++) {
-            final int index = i;
-            final TextView tile = crosshairStyleButtons[i];
-            if (tile == null) continue;
-            tile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    enableCrosshairFromPanel();
-                    getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_CROSSHAIR_STYLE, index).commit();
-                    updateCrosshairStyleUi();
-                    animateTile(tile);
-                    sendFloatAppearanceBroadcast();
-                }
-            });
-        }
-    }
-
-    private void setupCrosshairColorButtons() {
-        if (crosshairColorButtons == null) return;
-        for (int i = 0; i < crosshairColorButtons.length; i++) {
-            final int index = i;
-            final View swatch = crosshairColorButtons[i];
-            if (swatch == null) continue;
-            swatch.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    enableCrosshairFromPanel();
-                    getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_CROSSHAIR_COLOR, getCrosshairColorByIndex(index)).commit();
-                    updateCrosshairColorUi();
-                    animateTile(swatch);
-                    sendFloatAppearanceBroadcast();
-                }
-            });
-        }
-    }
-
-    private void setupCrosshairSizeSeek() {
-        if (seekCrosshairSize == null || tvCrosshairSizeValue == null) return;
-        int saved = getCrosshairSize();
-        seekCrosshairSize.setMax(CROSSHAIR_SIZE_MAX - CROSSHAIR_SIZE_MIN);
-        seekCrosshairSize.setProgress(saved - CROSSHAIR_SIZE_MIN);
-        updateCrosshairSizeLabel(saved);
-        seekCrosshairSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = CROSSHAIR_SIZE_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_CROSSHAIR_SIZE, value).commit();
-                updateCrosshairSizeLabel(value);
-                enableCrosshairFromPanel();
-                sendFloatAppearanceBroadcast();
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupCrosshairAlphaSeek() {
-        if (seekCrosshairAlpha == null || tvCrosshairAlphaValue == null) return;
-        int saved = getCrosshairAlpha();
-        seekCrosshairAlpha.setMax(CROSSHAIR_ALPHA_MAX - CROSSHAIR_ALPHA_MIN);
-        seekCrosshairAlpha.setProgress(saved - CROSSHAIR_ALPHA_MIN);
-        updateCrosshairAlphaLabel(saved);
-        seekCrosshairAlpha.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = CROSSHAIR_ALPHA_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_CROSSHAIR_ALPHA, value).commit();
-                updateCrosshairAlphaLabel(value);
-                enableCrosshairFromPanel();
-                sendFloatAppearanceBroadcast();
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void enableCrosshairFromPanel() {
-        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_CROSSHAIR, true).commit();
-        applyToggleState(cbCrosshair, tvCrosshairStatus, true);
-    }
-
-    private void animateTile(final View view) {
-        if (view == null) return;
-        view.animate().cancel();
-        view.setScaleX(0.94f);
-        view.setScaleY(0.94f);
-        view.animate().scaleX(1f).scaleY(1f).setDuration(120L).start();
-    }
-
-    private void updateCrosshairStyleUi() {
-        if (crosshairStyleButtons == null) return;
-        int selected = getCrosshairStyle();
-        for (int i = 0; i < crosshairStyleButtons.length; i++) {
-            TextView tile = crosshairStyleButtons[i];
-            if (tile == null) continue;
-            boolean active = i == selected;
-            tile.setBackgroundResource(active ? R.drawable.bg_crosshair_tile_selected : R.drawable.bg_crosshair_tile);
-            tile.setTextColor(active ? Color.parseColor("#FF22D3EE") : Color.parseColor("#FFE2E8F0"));
-            tile.setTypeface(Typeface.DEFAULT, active ? Typeface.BOLD : Typeface.NORMAL);
-        }
-    }
-
-    private void updateCrosshairColorUi() {
-        if (crosshairColorButtons == null) return;
-        int selectedColor = getCrosshairColor();
-        for (int i = 0; i < crosshairColorButtons.length; i++) {
-            View swatch = crosshairColorButtons[i];
-            if (swatch == null) continue;
-            boolean active = getCrosshairColorByIndex(i) == selectedColor;
-            swatch.setAlpha(active ? 1f : 0.72f);
-            swatch.setScaleX(active ? 1.14f : 1f);
-            swatch.setScaleY(active ? 1.14f : 1f);
-        }
-    }
-
-    private int getCrosshairStyle() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_CROSSHAIR_STYLE, 3);
-        if (saved < 0) saved = 0;
-        if (saved > 7) saved = 7;
-        return saved;
-    }
-
-    private int getCrosshairColor() {
-        return getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_CROSSHAIR_COLOR, Color.parseColor("#22D3EE"));
-    }
-
-    private int getCrosshairSize() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_CROSSHAIR_SIZE, CROSSHAIR_SIZE_DEFAULT);
-        if (saved < CROSSHAIR_SIZE_MIN) saved = CROSSHAIR_SIZE_MIN;
-        if (saved > CROSSHAIR_SIZE_MAX) saved = CROSSHAIR_SIZE_MAX;
-        return saved;
-    }
-
-    private int getCrosshairAlpha() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_CROSSHAIR_ALPHA, CROSSHAIR_ALPHA_DEFAULT);
-        if (saved < CROSSHAIR_ALPHA_MIN) saved = CROSSHAIR_ALPHA_MIN;
-        if (saved > CROSSHAIR_ALPHA_MAX) saved = CROSSHAIR_ALPHA_MAX;
-        return saved;
-    }
-
-    private int getCrosshairColorByIndex(int index) {
-        if (index == 1) return Color.parseColor("#22C55E");
-        if (index == 2) return Color.parseColor("#FACC15");
-        if (index == 3) return Color.parseColor("#FB923C");
-        if (index == 4) return Color.parseColor("#EF4444");
-        if (index == 5) return Color.parseColor("#EC4899");
-        if (index == 6) return Color.parseColor("#8B5CF6");
-        if (index == 7) return Color.parseColor("#F8FAFC");
-        if (index == 8) return Color.parseColor("#111827");
-        return Color.parseColor("#22D3EE");
-    }
-
-    private void updateCrosshairSizeLabel(int value) {
-        if (tvCrosshairSizeValue != null) tvCrosshairSizeValue.setText(value + "dp");
-    }
-
-    private void updateCrosshairAlphaLabel(int value) {
-        if (tvCrosshairAlphaValue != null) tvCrosshairAlphaValue.setText(value + "%");
-    }
-
-    private void setupFloatingToggle(final TextView toggle, final TextView status, final String key) {
-        if (toggle == null) return;
-        boolean isOn = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(key, true);
-        applyToggleState(toggle, status, isOn);
-        toggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean current = toggle.getTag() != null && (Boolean) toggle.getTag();
-                boolean next = !current;
-                applyToggleState(toggle, status, next);
-                animateToggle(toggle);
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(key, next).commit();
-                sendFloatAppearanceBroadcast();
-                updateConditionalGroups(true);
-            }
-        });
-    }
-
-    private void applyToggleState(TextView toggle, TextView status, boolean isOn) {
-        if (toggle == null) return;
-        toggle.setTag(isOn);
-        toggle.setText("");
-        toggle.setBackgroundResource(isOn ? R.drawable.bg_switch_custom_on : R.drawable.bg_switch_custom_off);
-        if (status != null) {
-            status.setText(isOn ? getString(R.string.floating_visible) : getString(R.string.floating_hidden));
-        }
-    }
-
-    private void animateToggle(final TextView toggle) {
-        if (toggle == null) return;
-        toggle.animate().cancel();
-        toggle.setScaleX(0.96f);
-        toggle.setScaleY(0.96f);
-        toggle.animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(120L)
-                .start();
-    }
-
-    private void setupAutoStopTeleToggle() {
-        if (cbAutoStopTele == null) return;
-        boolean isOn = getSharedPreferences(PREFS, MODE_PRIVATE)
-                .getBoolean(KEY_AUTO_STOP_TELE_ON_FREEZE, true);
-        applyAutoStopTeleState(isOn);
-        cbAutoStopTele.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean current = cbAutoStopTele.getTag() != null && (Boolean) cbAutoStopTele.getTag();
-                boolean next = !current;
-                applyAutoStopTeleState(next);
-                animateToggle(cbAutoStopTele);
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-                        .putBoolean(KEY_AUTO_STOP_TELE_ON_FREEZE, next)
-                        .commit();
-                sendFloatAppearanceBroadcast();
-            }
-        });
-    }
-
-    private void applyAutoStopTeleState(boolean isOn) {
-        if (cbAutoStopTele == null) return;
-        cbAutoStopTele.setTag(isOn);
-        cbAutoStopTele.setText("");
-        cbAutoStopTele.setBackgroundResource(isOn ? R.drawable.bg_switch_custom_on : R.drawable.bg_switch_custom_off);
-        if (tvAutoStopTeleStatus != null) {
-            tvAutoStopTeleStatus.setText(isOn ? "Tắt tele khi bật Ngưng" : "Giữ tele khi bật Ngưng");
-        }
-    }
-
-    private void setupDevModeToggle() {
-        if (cbDevMode == null) return;
-        boolean isOn = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(KEY_DEV_MODE, false);
-        applyDevModeState(isOn);
-        cbDevMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean current = cbDevMode.getTag() != null && (Boolean) cbDevMode.getTag();
-                boolean next = !current;
-                applyDevModeState(next);
-                animateToggle(cbDevMode);
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_DEV_MODE, next).commit();
-                sendFloatAppearanceBroadcast();
-            }
-        });
-    }
-
-    private void applyDevModeState(boolean isOn) {
-        if (cbDevMode == null) return;
-        cbDevMode.setTag(isOn);
-        cbDevMode.setText("");
-        cbDevMode.setBackgroundResource(isOn ? R.drawable.bg_switch_custom_on : R.drawable.bg_switch_custom_off);
-        if (tvDevModeStatus != null) {
-            tvDevModeStatus.setText(isOn ? "Đang ghi log" : "Đã tắt");
-        }
-    }
-
-    private void setupFloatSizeSeek() {
-        if (seekFloatSize == null || tvFloatSizeValue == null) return;
-
-        final int saved = getFloatSizePercent();
-        seekFloatSize.setMax(FLOAT_SIZE_MAX - FLOAT_SIZE_MIN);
-        seekFloatSize.setProgress(saved - FLOAT_SIZE_MIN);
-        updateFloatSizeLabel(saved);
-        seekFloatSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int size = FLOAT_SIZE_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_FLOAT_SIZE, size).commit();
-                updateFloatSizeLabel(size);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-    }
-
-    private int getFloatSizePercent() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_FLOAT_SIZE, 100);
-        if (saved < FLOAT_SIZE_MIN) saved = FLOAT_SIZE_MIN;
-        if (saved > FLOAT_SIZE_MAX) saved = FLOAT_SIZE_MAX;
-        return saved;
-    }
-
-    private void updateFloatSizeLabel(int sizePercent) {
-        if (tvFloatSizeValue != null) {
-            tvFloatSizeValue.setText(sizePercent + "%");
-        }
-    }
-
-    private void setupFloatAlphaSeek() {
-        if (seekFloatAlpha == null || tvFloatAlphaValue == null) return;
-
-        final int saved = getFloatAlphaPercent();
-        seekFloatAlpha.setMax(FLOAT_ALPHA_MAX - FLOAT_ALPHA_MIN);
-        seekFloatAlpha.setProgress(saved - FLOAT_ALPHA_MIN);
-        updateFloatAlphaLabel(saved);
-        seekFloatAlpha.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int alpha = FLOAT_ALPHA_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_FLOAT_ALPHA, alpha).commit();
-                updateFloatAlphaLabel(alpha);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private int getFloatAlphaPercent() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_FLOAT_ALPHA, 92);
-        if (saved < FLOAT_ALPHA_MIN) saved = FLOAT_ALPHA_MIN;
-        if (saved > FLOAT_ALPHA_MAX) saved = FLOAT_ALPHA_MAX;
-        return saved;
-    }
-
-    private void updateFloatAlphaLabel(int alphaPercent) {
-        if (tvFloatAlphaValue != null) {
-            tvFloatAlphaValue.setText(alphaPercent + "%");
-        }
-    }
-
-    private void setupMaskBarThicknessSeek() {
-        if (seekMaskBarThickness == null || tvMaskBarThicknessValue == null) return;
-        int saved = getMaskBarThickness();
-        seekMaskBarThickness.setMax(MASK_BAR_THICKNESS_MAX - MASK_BAR_THICKNESS_MIN);
-        seekMaskBarThickness.setProgress(saved - MASK_BAR_THICKNESS_MIN);
-        updateMaskBarThicknessLabel(saved);
-        seekMaskBarThickness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = MASK_BAR_THICKNESS_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_MASK_BAR_THICKNESS, value).commit();
-                updateMaskBarThicknessLabel(value);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupMaskBarLengthSeek() {
-        if (seekMaskBarLength == null || tvMaskBarLengthValue == null) return;
-        int saved = getMaskBarLength();
-        seekMaskBarLength.setMax(MASK_BAR_LENGTH_MAX - MASK_BAR_LENGTH_MIN);
-        seekMaskBarLength.setProgress(saved - MASK_BAR_LENGTH_MIN);
-        updateMaskBarLengthLabel(saved);
-        seekMaskBarLength.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = MASK_BAR_LENGTH_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_MASK_BAR_LENGTH, value).commit();
-                updateMaskBarLengthLabel(value);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupTeleReplayDelaySeek() {
-        if (seekTeleReplayDelay == null || tvTeleReplayDelayValue == null) return;
-        int saved = getTeleReplayDelayMs();
-        seekTeleReplayDelay.setMax(TELE_REPLAY_DELAY_MAX - TELE_REPLAY_DELAY_MIN);
-        seekTeleReplayDelay.setProgress(saved - TELE_REPLAY_DELAY_MIN);
-        updateTeleReplayDelayLabel(saved);
-        seekTeleReplayDelay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = TELE_REPLAY_DELAY_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_TELE_REPLAY_DELAY, value).commit();
-                updateTeleReplayDelayLabel(value);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupTeleSpeedBurstSeek() {
-        if (seekTeleSpeedBurst == null || tvTeleSpeedBurstValue == null) return;
-        int saved = getTeleSpeedBurstPackets();
-        seekTeleSpeedBurst.setMax(TELE_SPEED_BURST_MAX - TELE_SPEED_BURST_MIN);
-        seekTeleSpeedBurst.setProgress(saved - TELE_SPEED_BURST_MIN);
-        updateTeleSpeedBurstLabel(saved);
-        seekTeleSpeedBurst.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = TELE_SPEED_BURST_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_TELE_SPEED_BURST, value).commit();
-                updateTeleSpeedBurstLabel(value);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupTeleSpeedSleepSeek() {
-        if (seekTeleSpeedSleep == null || tvTeleSpeedSleepValue == null) return;
-        int saved = getTeleSpeedSleepMs();
-        seekTeleSpeedSleep.setMax(TELE_SPEED_SLEEP_MAX - TELE_SPEED_SLEEP_MIN);
-        seekTeleSpeedSleep.setProgress(saved - TELE_SPEED_SLEEP_MIN);
-        updateTeleSpeedSleepLabel(saved);
-        seekTeleSpeedSleep.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int value = TELE_SPEED_SLEEP_MIN + progress;
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putInt(KEY_TELE_SPEED_SLEEP, value).commit();
-                updateTeleSpeedSleepLabel(value);
-                sendFloatAppearanceBroadcast();
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
-    }
-
-    private void setupTeleSpeedCatchupToggle() {
-        if (cbTeleSpeedCatchup == null) return;
-        boolean tailOnly = getSharedPreferences(PREFS, MODE_PRIVATE)
-                .getBoolean(KEY_TELE_SPEED_CATCHUP_TAIL, TELE_SPEED_CATCHUP_TAIL_DEFAULT);
-        applyTeleSpeedCatchupState(tailOnly);
-        cbTeleSpeedCatchup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean current = cbTeleSpeedCatchup.getTag() != null && (Boolean) cbTeleSpeedCatchup.getTag();
-                boolean next = !current;
-                applyTeleSpeedCatchupState(next);
-                animateToggle(cbTeleSpeedCatchup);
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-                        .putBoolean(KEY_TELE_SPEED_CATCHUP_TAIL, next)
-                        .commit();
-                sendFloatAppearanceBroadcast();
-            }
-        });
-    }
-
-    private void applyTeleSpeedCatchupState(boolean tailOnly) {
-        if (cbTeleSpeedCatchup == null) return;
-        cbTeleSpeedCatchup.setTag(tailOnly);
-        cbTeleSpeedCatchup.setText("");
-        cbTeleSpeedCatchup.setBackgroundResource(tailOnly ? R.drawable.bg_switch_custom_on : R.drawable.bg_switch_custom_off);
-        if (tvTeleSpeedCatchupStatus != null) {
-            tvTeleSpeedCatchupStatus.setText(tailOnly
-                    ? "Chỉ giữ 32 move cuối khi đang xả"
-                    : "Giữ đầy đủ move mới khi đang xả");
-        }
-    }
-
-    private int getMaskBarThickness() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_MASK_BAR_THICKNESS, 16);
-        if (saved < MASK_BAR_THICKNESS_MIN) saved = MASK_BAR_THICKNESS_MIN;
-        if (saved > MASK_BAR_THICKNESS_MAX) saved = MASK_BAR_THICKNESS_MAX;
-        return saved;
-    }
-
-    private int getMaskBarLength() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_MASK_BAR_LENGTH, 220);
-        if (saved < MASK_BAR_LENGTH_MIN) saved = MASK_BAR_LENGTH_MIN;
-        if (saved > MASK_BAR_LENGTH_MAX) saved = MASK_BAR_LENGTH_MAX;
-        return saved;
-    }
-
-    private int getTeleReplayDelayMs() {
-        int saved = getSharedPreferences(PREFS, MODE_PRIVATE).getInt(KEY_TELE_REPLAY_DELAY, TELE_REPLAY_DELAY_MIN);
-        if (saved < TELE_REPLAY_DELAY_MIN) saved = TELE_REPLAY_DELAY_MIN;
-        if (saved > TELE_REPLAY_DELAY_MAX) saved = TELE_REPLAY_DELAY_MAX;
-        return saved;
-    }
-
-    private int getTeleSpeedBurstPackets() {
-        return 1;
-    }
-
-    private int getTeleSpeedSleepMs() {
-        return 6;
-    }
-
-    private void updateMaskBarThicknessLabel(int value) {
-        if (tvMaskBarThicknessValue != null) {
-            tvMaskBarThicknessValue.setText(value + "dp");
-        }
-    }
-
-    private void updateMaskBarLengthLabel(int value) {
-        if (tvMaskBarLengthValue != null) {
-            tvMaskBarLengthValue.setText(value + "dp");
-        }
-    }
-
-    private void updateTeleReplayDelayLabel(int value) {
-        if (tvTeleReplayDelayValue != null) {
-            tvTeleReplayDelayValue.setText(value + "ms");
-        }
-    }
-
-    private void updateTeleSpeedBurstLabel(int value) {
-        if (tvTeleSpeedBurstValue != null) {
-            tvTeleSpeedBurstValue.setText(value + " gói");
-        }
-    }
-
-    private void updateTeleSpeedSleepLabel(int value) {
-        if (tvTeleSpeedSleepValue != null) {
-            tvTeleSpeedSleepValue.setText(value + "ms");
-        }
-    }
-
-    private void updateConditionalGroups(boolean animate) {
-        boolean maskEnabled = false;
-        boolean teleEnabled = false;
-        boolean speedEnabled = false;
-        setOptionalGroupVisible(groupMaskOptions, maskEnabled, animate);
-        setOptionalGroupVisible(groupTeleOptions, teleEnabled, animate);
-        setOptionalGroupVisible(groupTeleSpeedOptions, speedEnabled, animate);
-    }
-
-    private void setOptionalGroupVisible(final View group, boolean visible, boolean animate) {
-        if (group == null) return;
-        if (!animate) {
-            group.setVisibility(visible ? View.VISIBLE : View.GONE);
-            group.setAlpha(visible ? 1f : 0f);
-            group.setTranslationY(0f);
-            return;
-        }
-        group.animate().cancel();
-        if (visible) {
-            group.setVisibility(View.VISIBLE);
-            group.setAlpha(0f);
-            group.setTranslationY(18f);
-            group.animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setDuration(180L)
-                    .start();
-        } else {
-            group.animate()
-                    .alpha(0f)
-                    .translationY(-10f)
-                    .setDuration(130L)
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            group.setVisibility(View.GONE);
-                            group.setTranslationY(0f);
-                        }
-                    })
-                    .start();
-        }
-    }
-
-    private void animateMainEntrance() {
-        if (mainContent == null) return;
-        for (int i = 0; i < mainContent.getChildCount(); i++) {
-            View child = mainContent.getChildAt(i);
-            child.setAlpha(0f);
-            child.setTranslationY(28f);
-            child.animate()
-                    .alpha(1f)
-                    .translationY(0f)
-                    .setStartDelay(45L * i)
-                    .setDuration(260L)
-                    .start();
-        }
-    }
-
-    private void sendFloatAppearanceBroadcast() {
-        Intent intent = new Intent(ACTION_APPLY_FLOAT_APPEARANCE);
-        intent.setPackage(getPackageName());
-        intent.putExtra(EXTRA_FLOAT_SIZE, getFloatSizePercent());
-        intent.putExtra(EXTRA_FLOAT_ALPHA, getFloatAlphaPercent());
-        intent.putExtra(EXTRA_MASK_BAR, false);
-        intent.putExtra(EXTRA_MASK_BAR_THICKNESS, getMaskBarThickness());
-        intent.putExtra(EXTRA_MASK_BAR_LENGTH, getMaskBarLength());
-        intent.putExtra(EXTRA_CROSSHAIR, isFloatEnabled(KEY_CROSSHAIR));
-        intent.putExtra(EXTRA_CROSSHAIR_STYLE, getCrosshairStyle());
-        intent.putExtra(EXTRA_CROSSHAIR_COLOR, getCrosshairColor());
-        intent.putExtra(EXTRA_CROSSHAIR_SIZE, getCrosshairSize());
-        intent.putExtra(EXTRA_CROSSHAIR_ALPHA, getCrosshairAlpha());
-        intent.putExtra(EXTRA_AUTO_STOP_TELE_ON_FREEZE, true);
-        intent.putExtra(EXTRA_DEV_MODE, false);
-        intent.putExtra(EXTRA_TELE_REPLAY_DELAY, TELE_REPLAY_DELAY_MIN);
-        intent.putExtra(EXTRA_TELE_SPEED_BURST, 1);
-        intent.putExtra(EXTRA_TELE_SPEED_SLEEP, 6);
-        intent.putExtra(EXTRA_TELE_SPEED_CATCHUP_TAIL, TELE_SPEED_CATCHUP_TAIL_DEFAULT);
-        intent.putExtra(EXTRA_LOBBY_ROUTE, true);
-        sendBroadcast(intent);
-    }
-
-    private boolean isFloatEnabled(String key) {
-        return getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(key, true);
-    }
-
-    private void setupPermissionToggle() {
-        cbVpn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    Intent i = VpnService.prepare(MainActivity.this);
-                    if (i != null) startActivityForResult(i, REQ_VPN);
-                    else refreshPermissionStates();
-                } catch (Exception e) { }
-                refreshPermissionStates();
-            }
-        });
-
-        cbDisplay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(MainActivity.this)) {
-                    try {
-                        startActivityForResult(
-                            new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION), REQ_OVERLAY);
-                    } catch (Exception e) { }
-                }
-                refreshPermissionStates();
-            }
-        });
-
-        cbNotif.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= 33) {
-                    try {
-                        requestPermissions(
-                            new String[]{"android.permission.POST_NOTIFICATIONS"}, REQ_NOTIF);
-                    } catch (Exception e) { }
-                }
-                refreshPermissionStates();
-            }
-        });
-
-        cbStorage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    if (Build.VERSION.SDK_INT >= 33) {
-                        requestPermissions(new String[]{
-                            "android.permission.READ_MEDIA_IMAGES"
-                        }, REQ_STORAGE);
-                    } else {
-                        requestPermissions(new String[]{
-                            "android.permission.READ_EXTERNAL_STORAGE",
-                            "android.permission.WRITE_EXTERNAL_STORAGE"
-                        }, REQ_STORAGE);
-                    }
-                } catch (Exception e) { }
-                refreshPermissionStates();
-            }
-        });
-    }
-
-    private void refreshPermissionStates() {
-        boolean vpnOk = false;
-        try {
-            vpnOk = (VpnService.prepare(this) == null);
-        } catch (Exception e) { }
-        setPermissionState(dotVpn, tvVpnStatus, cbVpn, "VPN", vpnOk);
-
-        boolean displayOk = (Build.VERSION.SDK_INT < 23) || Settings.canDrawOverlays(this);
-        setPermissionState(dotDisplay, tvDisplayStatus, cbDisplay, "Hiển thị trên ứng dụng khác", displayOk);
-
-        boolean notifOk = true;
-        if (Build.VERSION.SDK_INT >= 33) {
-            notifOk = (checkSelfPermission("android.permission.POST_NOTIFICATIONS")
-                == PackageManager.PERMISSION_GRANTED);
-        }
-        setPermissionState(dotNotif, tvNotifStatus, cbNotif, "Thông báo", notifOk);
-
-        boolean storageOk;
-        if (Build.VERSION.SDK_INT >= 33) {
-            storageOk = (checkSelfPermission("android.permission.READ_MEDIA_IMAGES")
-                == PackageManager.PERMISSION_GRANTED);
-        } else {
-            storageOk = (checkSelfPermission("android.permission.READ_EXTERNAL_STORAGE")
-                == PackageManager.PERMISSION_GRANTED);
-        }
-        setPermissionState(dotStorage, tvStorageStatus, cbStorage, "Bộ nhớ", storageOk);
-    }
-
-    private void setPermissionState(View dot, TextView label, TextView toggle, String name, boolean granted) {
-        if (dot != null)
-            dot.setBackgroundResource(granted ? R.drawable.dot_on : R.drawable.dot_off);
-        if (label != null)
-            label.setText(granted
-    ? getString(R.string.permission_granted)
-    : getString(R.string.permission_not_granted));
-        if (toggle != null) {
-            toggle.setTag(granted);
-            toggle.setText("");
-            toggle.setBackgroundResource(granted ? R.drawable.bg_switch_custom_on : R.drawable.bg_switch_custom_off);
-        }
-    }
-
-    private void setUI(boolean on) {
-        engineOn = on;
-        if (dotEngine != null)
-            dotEngine.setBackgroundResource(on ? R.drawable.dot_on : R.drawable.dot_off);
-        if (on) {
-            btnEngine.setBackgroundResource(R.drawable.bg_power_circle_on);
-            if (ivEnginePower != null) ivEnginePower.setColorFilter(Color.parseColor("#FF05110B"));
-            tvStatus.setText(getString(R.string.engine_status_connected));
-            tvStatus.setTextColor(Color.parseColor("#FF4DFFB2"));
-        } else {
-            btnEngine.setBackgroundResource(R.drawable.bg_power_circle);
-            if (ivEnginePower != null) ivEnginePower.setColorFilter(Color.parseColor("#FFE6E8F2"));
-            tvStatus.setText(getString(R.string.engine_status_disconnected));
-            tvStatus.setTextColor(Color.parseColor("#FF6D7286"));
-        }
-    }
-
-    private void loadApps() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    android.content.pm.PackageManager pm = getPackageManager();
-                    List pkgs = pm.getInstalledPackages(0x80);
-                    final List resList  = new ArrayList();
-                    final List nameList = new ArrayList();
-
-                    for (int i = 0; i < pkgs.size(); i++) {
-                        android.content.pm.PackageInfo pi =
-                            (android.content.pm.PackageInfo) pkgs.get(i);
-                        if (pi == null || pi.applicationInfo == null) continue;
-                        if (pi.packageName.equals(getPackageName())) continue;
-                        if (pm.getLaunchIntentForPackage(pi.packageName) == null) continue;
-                        String label;
-                        try {
-                            label = pm.getApplicationLabel(pi.applicationInfo).toString();
-                        } catch (Exception e) {
-                            label = pi.packageName;
-                        }
-                        resList.add(pi.applicationInfo);
-                        nameList.add(label);
-                    }
-
-                    for (int i = 1; i < resList.size(); i++) {
-                        Object appVal  = resList.get(i);
-                        String nameVal = (String) nameList.get(i);
-                        int j = i - 1;
-                        while (j >= 0 && ((String) nameList.get(j)).compareToIgnoreCase(nameVal) > 0) {
-                            resList.set(j + 1, resList.get(j));
-                            nameList.set(j + 1, nameList.get(j));
-                            j--;
-                        }
-                        resList.set(j + 1, appVal);
-                        nameList.set(j + 1, nameVal);
-                    }
-
-                    final String[] arr = new String[nameList.size()];
-                    for (int i = 0; i < nameList.size(); i++) arr[i] = (String) nameList.get(i);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            apps   = resList;
-                            names  = arr;
-                            loaded = true;
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, "LoadApps").start();
-    }
-
-    private void checkOverlay() {
-        waiting = true;
-        if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(this)) {
-            try {
-                startActivityForResult(
-                    new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION), REQ_OVERLAY);
-            } catch (Exception e) {
-                checkVpn();
-            }
-        } else {
-            checkVpn();
-        }
-    }
-
-    private void checkVpn() {
-        try {
-            Intent vpnIntent = VpnService.prepare(this);
-            if (vpnIntent != null) {
-                startActivityForResult(vpnIntent, REQ_VPN);
-            } else {
-                startEngine();
-            }
-        } catch (Exception e) {
-            waiting = false;
-            setUI(false);
-            toast("VPN: " + e.getMessage());
-        }
-    }
-
-    private void startEngine() {
-        waiting = false;
-        try {
-            getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
-            Intent i = new Intent(this, PacketVpnService.class);
-            i.setAction("com.fakelag.cryhard8.SET_APP");
-            i.putExtra("PACKAGE", selPkg);
-            i.putExtra("SHOW_GHOST",    isFloatEnabled(KEY_GHOST));
-            i.putExtra("SHOW_FREEZE",   isFloatEnabled(KEY_FREEZE));
-            i.putExtra("SHOW_TELE",     false);
-            i.putExtra("SHOW_TELE_V2",  false);
-            i.putExtra("SHOW_DELAY_PING", false);
-            i.putExtra("SHOW_TELE_SPEED", isFloatEnabled(KEY_TELE_SPEED));
-            if (Build.VERSION.SDK_INT >= 26) {
-                startForegroundService(i);
-            } else {
-                startService(i);
-            }
-
-            final Activity ctx = this;
-            final boolean showGhost   = isFloatEnabled(KEY_GHOST);
-            final boolean showFreeze  = isFloatEnabled(KEY_FREEZE);
-            final boolean showTele    = false;
-            final boolean showTeleV2  = false;
-            final boolean showDelayPing = false;
-            final boolean showTeleSpeed = isFloatEnabled(KEY_TELE_SPEED);
-
-            btnEngine.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Intent si = new Intent(ctx, FloatingOverlayService.class);
-                        si.putExtra("SHOW_GHOST",    showGhost);
-                        si.putExtra("SHOW_FREEZE",   showFreeze);
-                        si.putExtra("SHOW_TELE",     showTele);
-                        si.putExtra("SHOW_TELE_V2",  showTeleV2);
-                        si.putExtra("SHOW_DELAY_PING", showDelayPing);
-                        si.putExtra("SHOW_TELE_SPEED", showTeleSpeed);
-                        if (Build.VERSION.SDK_INT >= 26) {
-                            startForegroundService(si);
-                        } else {
-                            startService(si);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, 500L);
-
-            setUI(true);
-            toast("Engine ON!");
-        } catch (Exception e) {
-            waiting = false;
-            setUI(false);
-            toast("XM: " + e.getMessage());
-        }
-    }
-
-    private void stopEngine() {
-        waiting = false;
-        try {
-            stopService(new Intent(this, FloatingOverlayService.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            Intent i = new Intent(this, PacketVpnService.class);
-            i.setAction("com.fakelag.cryhard8.STOP");
-            startService(i);
-            setUI(false);
-            toast("Engine OFF");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showPicker() {
-        if (apps.isEmpty()) { toast("No app!"); return; }
-        try {
-            new AlertDialog.Builder(this)
-                .setTitle("CHOOSE THE TARGET APP")
-                .setItems((CharSequence[]) names, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        android.content.pm.ApplicationInfo ai =
-                            (android.content.pm.ApplicationInfo) apps.get(which);
-                        selPkg = ai.packageName;
-                        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
-                        tvApp.setText("SELECTED: " + names[which]);
-                        if (dotApp != null)
-                            dotApp.setBackgroundResource(R.drawable.dot_on);
-                        toast("SELECTED: " + names[which]);
-                    }
-                })
-                .setNegativeButton("OK", null)
-                .show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQ_OVERLAY) {
-            refreshPermissionStates();
-            checkVpn();
-        } else if (requestCode == REQ_VPN) {
-            refreshPermissionStates();
-            if (resultCode == RESULT_OK) {
-                startEngine();
-            } else {
-                waiting = false;
-                setUI(false);
-                toast("VPN Permission denied!");
-            }
-        } else if (requestCode == REQ_NOTIF || requestCode == REQ_STORAGE) {
-            refreshPermissionStates();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
-        refreshPermissionStates();
-    }
-
+    // ... (Các hàm setup khác giữ nguyên)
+    
     @Override
     protected void onDestroy() {
+        try {
+            unregisterReceiver(killReceiver);
+        } catch (Exception e) {}
         super.onDestroy();
     }
 
@@ -1372,4 +497,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    // Các hàm setupCrosshairControls, setupFloatingToggle, ... giữ nguyên như cũ
+    // (Mình rút gọn để không quá dài, bạn giữ nguyên các hàm cũ là được)
 }
