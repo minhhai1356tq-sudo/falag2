@@ -139,22 +139,19 @@ public class MainActivity extends Activity {
     private ViewGroup mainContent;
     private View groupMaskOptions, groupTeleOptions, groupTeleSpeedOptions;
 
-    // BroadcastReceiver lắng nghe tín hiệu Ban/Kick từ BackgroundCheckService
+    // 1. THÊM BIẾN NHẬN TÍN HIỆU TẮT APP
     private BroadcastReceiver killReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
             if (intent == null) return;
             String reason = intent.getStringExtra("reason");
             if ("BANNED".equals(reason) || "KICKED".equals(reason)) {
-                // 1. Tắt VPN
                 try {
                     Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
                     vpnStop.setAction("com.fakelag.cryhard8.STOP");
                     startService(vpnStop);
                 } catch (Exception e) {}
-                // 2. Tắt Nút nổi
                 try { stopService(new Intent(MainActivity.this, FloatingOverlayService.class)); } catch (Exception e) {}
-                // 3. Hiện màn hình đen
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -172,18 +169,18 @@ public class MainActivity extends Activity {
         // KIỂM TRA KEY KHI MỞ APP
         if (!KeyManager.isActivated(this)) {
             showKeyDialog();
-            return; // Dừng không cho chạy tiếp xuống dưới
+            return; 
         }
 
         setContentView(R.layout.activity_main);
 
-        // Khởi động Service chạy ngầm check trạng thái Ban/Kick
+        // 2. KHỞI ĐỘNG SERVICE CHẠY NGẦM CHECK BAN/KICK
         try {
             Intent serviceIntent = new Intent(this, BackgroundCheckService.class);
             startService(serviceIntent);
         } catch (Exception e) { }
 
-        // Đăng ký nhận tín hiệu tắt App
+        // 3. ĐĂNG KÝ NHẬN TÍN HIỆU TẮT APP
         IntentFilter filter = new IntentFilter("com.fakelag.cryhard8.KILL_APP");
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(killReceiver, filter, Context.RECEIVER_EXPORTED);
@@ -347,7 +344,7 @@ public class MainActivity extends Activity {
         });
     }
 
-    // === HÀM HIỂN THỊ MÀN HÌNH ĐEN KHI BỊ BAN/KICK ===
+    // 4. THÊM HÀM HIỂN THỊ MÀN HÌNH ĐEN
     private void showBlacklistScreen(String reason) {
         final TextView tv = new TextView(this);
         tv.setText(reason.equals("BANNED") ? "MÁY BẠN ĐÃ BỊ BACKLIST\nVUI LÒNG LIÊN HỆ ADMIN ĐỂ ĐƯỢC HỖ TRỢ" : "PHIÊN ĐĂNG NHẬP ĐÃ HẾT HẠN\nVUI LÒNG NHẬP LẠI KEY");
@@ -372,20 +369,18 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         
-        // Tự động tắt app sau 30 giây
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 try {
                     wm.removeView(tv);
                 } catch (Exception e) {}
-                finishAffinity(); // Đóng toàn bộ app
+                finishAffinity(); 
                 System.exit(0);
             }
         }, 30000);
     }
 
-    // === HÀM HIỂN THỊ DIALOG NHẬP KEY ===
     private void showKeyDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("KÍCH HOẠT KEY");
@@ -410,7 +405,6 @@ public class MainActivity extends Activity {
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "KÍCH HOẠT", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface d, int which) {
-                // Xử lý ở dưới
             }
         });
         
@@ -447,7 +441,7 @@ public class MainActivity extends Activity {
                                 if (success) {
                                     Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
-                                    recreate(); // Khởi động lại Activity
+                                    recreate(); 
                                 } else {
                                     if (message.startsWith("UPDATE|")) {
                                         String updateMsg = message.replace("UPDATE|", "");
@@ -479,8 +473,12 @@ public class MainActivity extends Activity {
         refreshPermissionStates();
     }
 
-    // ... (Các hàm setup khác giữ nguyên)
-    
+    // ... (CÁC HÀM CŨ CỦA BẠN TỪ ĐÂY TRỞ XUỐNG GIỮ NGUYÊN)
+    // Bạn hãy giữ lại toàn bộ các hàm setupCrosshairControls, setupFloatingToggle, 
+    // setupFloatSizeSeek, setupPermissionToggle, loadApps, checkOverlay, 
+    // checkVpn, startEngine, stopEngine, showPicker, onActivityResult...
+    // (Mình không dán lại vì nó rất dài, nhưng BẠN PHẢI GIỮ NGUYÊN CHÚNG).
+
     @Override
     protected void onDestroy() {
         try {
@@ -497,7 +495,4 @@ public class MainActivity extends Activity {
             }
         });
     }
-
-    // Các hàm setupCrosshairControls, setupFloatingToggle, ... giữ nguyên như cũ
-    // (Mình rút gọn để không quá dài, bạn giữ nguyên các hàm cũ là được)
 }
