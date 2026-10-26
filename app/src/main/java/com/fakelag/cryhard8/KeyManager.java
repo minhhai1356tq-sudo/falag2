@@ -6,7 +6,9 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,7 +18,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class KeyManager {
-    private static final String RENDER_URL = "https://minizo-sevaapi.onrender.com/api/check_key"; // Link Render của bạn
+    // LƯU Ý: Đảm bảo đường link này khớp với link Render của bạn
+    private static final String BASE_URL = "https://minizo-sevaapi.onrender.com";
     private static final String APP_SECRET = "APP_SECRET_456"; // Phải khớp với app.py
     private static final String PREFS_NAME = "key_prefs";
     private static final String KEY_ACTIVATED = "is_activated";
@@ -25,22 +28,27 @@ public class KeyManager {
         void onResult(boolean success, String message);
     }
 
+    public interface StatusCallback {
+        void onResult(String status);
+    }
+
+    // Hàm kiểm tra Key khi nhập vào (hiển thị Dialog)
     public static void checkKeyOnline(final Context context, final String keyCode, final KeyCallback callback) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                HttpURLConnection conn = null;
                 try {
-                    URL url = new URL(RENDER_URL);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    URL url = new URL(BASE_URL + "/api/check_key");
+                    conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("POST");
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     conn.setRequestProperty("X-App-Key", APP_SECRET);
                     conn.setDoOutput(true);
-                    conn.setConnectTimeout(60000); // Chờ 60s vì Render có thể ngủ
+                    conn.setConnectTimeout(60000);
                     conn.setReadTimeout(60000);
 
-                    // Lấy thông tin máy
                     String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
                     String deviceName = Build.MANUFACTURER + " " + Build.MODEL;
                     String androidVer = Build.VERSION.RELEASE;
@@ -59,7 +67,6 @@ public class KeyManager {
                         }
                     } catch (Exception ignored) {}
 
-                    // Tạo JSON Body
                     JSONObject json = new JSONObject();
                     json.put("key_code", keyCode);
                     json.put("device_id", deviceId);
@@ -72,8 +79,6 @@ public class KeyManager {
                     os.write(json.toString().getBytes("UTF-8"));
                     os.close();
 
-                    // Đọc phản hồi
-                    int responseCode = conn.getResponseCode();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     StringBuilder response = new StringBuilder();
                     String line;
@@ -85,7 +90,6 @@ public class KeyManager {
                     String message = resJson.optString("message", "Lỗi không xác định");
 
                     if (status.equals("OK")) {
-                        // Lưu trạng thái đã kích hoạt
                         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                         prefs.edit().putBoolean(KEY_ACTIVATED, true).putString("saved_key", keyCode).apply();
                         callback.onResult(true, message);
@@ -97,9 +101,52 @@ public class KeyManager {
                 } catch (Exception e) {
                     e.printStackTrace();
                     callback.onResult(false, "Không thể kết nối Server. Vui lòng thử lại!");
+                } finally {
+                    if (conn != null) conn.disconnect();
                 }
             }
         });
+    }
+
+    // Hàm kiểm tra trạng thái ngầm (dành cho Background Service)
+    public static void checkStatusSilent(final Context context, final String deviceId, final StatusCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection conn = null;
+                try {
+                    URL url = new URL(BASE_URL + "/api/check_status");
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setRequestProperty("X-App-Key", APP_SECRET);
+                    conn.setDoOutput(true);
+                    conn.setConnectTimeout(10000); // Timeout ngắn vì chạy ngầm
+                    conn.setReadTimeout(10000);
+
+                    JSONObject json = new JSONObject();
+                    json.put("device_id", deviceId);
+
+                    OutputStream os = conn.getOutputStream();
+                    os.write(json.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) response.append(line);
+                    reader.close();
+
+                    JSONObject resJson = new JSONObject(response.toString());
+                    String status = resJson.optString("status");
+                    callback.onResult(status);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (conn != null) conn.disconnect();
+                }
+            }
+        }).start();
     }
 
     public static boolean isActivated(Context context) {
