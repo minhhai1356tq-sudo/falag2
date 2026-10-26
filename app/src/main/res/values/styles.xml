@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Holo">
+        <item name="android:colorBackground">#ff0d1117</item>
+        <item name="android:windowBackground">#ff0d1117</item>
+    </style>
+
+    <style name="ModernSwitch">
+        <item name="android:layout_width">54dp</item>
+        <item name="android:layout_height">28dp</item>
+        <item name="android:minWidth">54dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@drawable/bg_switch_custom_off</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="ModernSwitchSmall">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:minWidth">42dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@drawable/bg_switch_custom_off</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

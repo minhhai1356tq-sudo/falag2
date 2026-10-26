@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SunnyMod - Fake Lag</string>
+    <string name="creator">Phát triển bởi SunnyMod</string>
+    <string name="engine_status_disconnected">ĐÃ NGẮT KẾT NỐI</string>
+    <string name="engine_status_connected">ĐÃ KẾT NỐI</string>
+    <string name="activate_engine">KÍCH HOẠT ENGINE</string>
+    <string name="deactivate_engine">NGỪNG KÍCH HOẠT</string>
+    <string name="select_target_app">CHỌN APP TỰ DO</string>
+    <string name="ff_normal">FF THƯỜNG</string>
+    <string name="ff_max">FF MAX</string>
+    <string name="target_awaiting">ĐANG CHỜ CHỌN MỤC TIÊU…</string>
+    <string name="permission_granted">Đã cấp</string>
+    <string name="permission_not_granted">Chưa cấp</string>
+    <string name="checking">Đang kiểm tra…</string>
+    <string name="pos_locked">Đã khóa vị trí</string>
+    <string name="pos_unlocked">Đã mở khóa vị trí</string>
+    <string name="toast_choose_app">Vui lòng chọn ứng dụng mục tiêu!</string>
+    <string name="floating_size">KÍCH CỠ NÚT TRÒN</string>
+    <string name="floating_size_hint">Điều chỉnh kích thước hiển thị của các nút tròn trên màn hình.</string>
+    <string name="floating_size_applied">Áp dụng theo thời gian thực</string>
+    <string name="floating_alpha">ĐỘ TRONG SUỐT NÚT TRÒN</string>
+    <string name="floating_alpha_hint">Giảm hoặc tăng độ rõ của nút nổi ngay khi đang bật overlay.</string>
+    <string name="floating_alpha_applied">Thay đổi trực tiếp khi đang hiển thị</string>
+    <string name="match_mask">CHE MÃ TRẬN</string>
+    <string name="match_mask_thickness">ĐỘ DÀY THANH</string>
+    <string name="match_mask_length">ĐỘ DÀI THANH</string>
+    <string name="match_mask_thickness_hint">Chỉnh độ dày của thanh trắng theo thời gian thực.</string>
+    <string name="match_mask_length_hint">Chỉnh chiều dài của thanh trắng theo thời gian thực.</string>
+    <string name="match_mask_applied">Có thể kéo tự do, giữ 2 giây để khóa vị trí</string>
+    <string name="floating_visible">Đang hiển thị</string>
+    <string name="floating_hidden">Đang ẩn</string>
+    <string name="freeze">ĐÓNG BĂNG</string>
+    <string name="ghost">TÀNG HÌNH</string>
+    <string name="tele">DỊCH CHUYỂN</string>
+    <string name="tele_v2">TÀNG HÌNH V2</string>
+    <string name="delay_ping">DELAY PING</string>
+    <string name="tele_speed">DỊCH CHUYỂN SPEED</string>
+</resources>

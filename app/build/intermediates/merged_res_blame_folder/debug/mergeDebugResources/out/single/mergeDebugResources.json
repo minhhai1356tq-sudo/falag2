@@ -1,0 +1,258 @@
+[
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_btn_green.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_btn_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_dot_red.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\dot_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_switch_custom_off.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_switch_custom_off.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_card.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_card.xml"
+    },
+    {
+        "merged": "com.fakelag.cryhard8.app-debug-4:/layout_activity_main.xml.flat",
+        "source": "com.fakelag.cryhard8.app-main-6:/layout/activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_crosshair_tile.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_crosshair_tile.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_white.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_white.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_engine_button_on.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_engine_button_on.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_card_inner.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_card_inner.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\color_switch_track_tint.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\color\\switch_track_tint.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_dialog.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_dialog.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_section_marker.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_section_marker.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_dot_green.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\dot_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_black.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_black.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_toggle_on.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\toggle_on.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_btn_gray_stroke_thin.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\btn_gray_stroke_thin.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_top_action.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_top_action.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_power_circle.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_power_circle.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_ic_launcher.png.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_card_gold.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_card_gold.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_pink.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_pink.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_flow_button.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_flow_button.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_ic_power.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\ic_power.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_seekbar_float_thumb.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\seekbar_float_thumb.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_crosshair_tile_selected.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_crosshair_tile_selected.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_avatar_inner.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_avatar_inner.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_main_gradient.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_main_gradient.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_seekbar_purple_progress.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\seekbar_purple_progress.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_toggle_off.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\toggle_off.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_seekbar_purple_thumb.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\seekbar_purple_thumb.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_size_value.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_size_value.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_avatar_frame.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_avatar_frame.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_feature_icon_green.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_feature_icon_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_yellow.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_yellow.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_dot_grey.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\dot_grey.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_dot_on.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\dot_on.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_chip_teal.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_chip_teal.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_app_avatar.png.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\app_avatar.png"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_seekbar_float_progress.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\seekbar_float_progress.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_ic_power_button_outline.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\ic_power_button_outline.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_cyan.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_cyan.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\color_switch_thumb_tint.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\color\\switch_thumb_tint.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_btn_green_stroke.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\btn_green_stroke.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_engine_button_off.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_engine_button_off.xml"
+    },
+    {
+        "merged": "com.fakelag.cryhard8.app-debug-4:/drawable_bg_power_circle_on.xml.flat",
+        "source": "com.fakelag.cryhard8.app-main-6:/drawable/bg_power_circle_on.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_purple.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_purple.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_ic_launcher_meow.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\ic_launcher_meow.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_green.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_hue_slider.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_hue_slider.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_btn_gray_stroke.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\btn_gray_stroke.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_header_chip.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_header_chip.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_dot_off.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\dot_off.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_feature_icon.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_feature_icon.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_hero_card.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_hero_card.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_btn_red.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_btn_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_divider.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\divider.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_switch_custom_on.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_switch_custom_on.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_switch_thumb.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\switch_thumb.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_switch_track_modern.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\switch_track_modern.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_orange.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_orange.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_bg_btn_cancel.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\bg_btn_cancel.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_swatch_red.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\swatch_red.xml"
+    },
+    {
+        "merged": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-debug-4:\\drawable_switch_thumb_modern.xml.flat",
+        "source": "C:\\Users\\minhd\\.gradle\\daemon\\8.10\\com.fakelag.cryhard8.app-main-6:\\drawable\\switch_thumb_modern.xml"
+    }
+]

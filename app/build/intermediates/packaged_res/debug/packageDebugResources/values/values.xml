@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="btn_clear_app" type="id"/>
+    <item name="btn_engine" type="id"/>
+    <item name="btn_ff_max" type="id"/>
+    <item name="btn_ff_normal" type="id"/>
+    <item name="btn_show_floating" type="id"/>
+    <item name="cb_auto_stop_tele" type="id"/>
+    <item name="cb_crosshair" type="id"/>
+    <item name="cb_dev_mode" type="id"/>
+    <item name="cb_display" type="id"/>
+    <item name="cb_float_delay_ping" type="id"/>
+    <item name="cb_float_freeze" type="id"/>
+    <item name="cb_float_ghost" type="id"/>
+    <item name="cb_float_ghost_v2" type="id"/>
+    <item name="cb_float_tele" type="id"/>
+    <item name="cb_float_tele_speed" type="id"/>
+    <item name="cb_float_tele_v2" type="id"/>
+    <item name="cb_notif" type="id"/>
+    <item name="cb_storage" type="id"/>
+    <item name="cb_tele_speed_catchup" type="id"/>
+    <item name="cb_vpn" type="id"/>
+    <item name="crosshair_color_black" type="id"/>
+    <item name="crosshair_color_cyan" type="id"/>
+    <item name="crosshair_color_green" type="id"/>
+    <item name="crosshair_color_orange" type="id"/>
+    <item name="crosshair_color_pink" type="id"/>
+    <item name="crosshair_color_purple" type="id"/>
+    <item name="crosshair_color_red" type="id"/>
+    <item name="crosshair_color_white" type="id"/>
+    <item name="crosshair_color_yellow" type="id"/>
+    <item name="crosshair_style_cross" type="id"/>
+    <item name="crosshair_style_custom" type="id"/>
+    <item name="crosshair_style_dot" type="id"/>
+    <item name="crosshair_style_dot_ring" type="id"/>
+    <item name="crosshair_style_dynamic" type="id"/>
+    <item name="crosshair_style_minimal" type="id"/>
+    <item name="crosshair_style_ring" type="id"/>
+    <item name="crosshair_style_sniper" type="id"/>
+    <item name="devbtn" type="id"/>
+    <item name="dot_app" type="id"/>
+    <item name="dot_display" type="id"/>
+    <item name="dot_engine" type="id"/>
+    <item name="dot_notif" type="id"/>
+    <item name="dot_storage" type="id"/>
+    <item name="dot_vpn" type="id"/>
+    <item name="grid_crosshair_style" type="id"/>
+    <item name="group_mask_options" type="id"/>
+    <item name="group_tele_options" type="id"/>
+    <item name="group_tele_speed_options" type="id"/>
+    <item name="main_content" type="id"/>
+    <item name="seek_crosshair_alpha" type="id"/>
+    <item name="seek_crosshair_size" type="id"/>
+    <item name="seek_tele_replay_delay" type="id"/>
+    <item name="seek_tele_speed_burst" type="id"/>
+    <item name="seek_tele_speed_sleep" type="id"/>
+    <item name="sw_vpn" type="id"/>
+    <item name="tv_auto_stop_tele_status" type="id"/>
+    <item name="tv_crosshair_alpha_value" type="id"/>
+    <item name="tv_crosshair_size_value" type="id"/>
+    <item name="tv_crosshair_status" type="id"/>
+    <item name="tv_dev_mode_status" type="id"/>
+    <item name="tv_display_status" type="id"/>
+    <item name="tv_engine_desc" type="id"/>
+    <item name="tv_float_delay_ping_status" type="id"/>
+    <item name="tv_float_freeze_status" type="id"/>
+    <item name="tv_float_ghost_status" type="id"/>
+    <item name="tv_float_ghost_v2_status" type="id"/>
+    <item name="tv_float_tele_speed_status" type="id"/>
+    <item name="tv_float_tele_status" type="id"/>
+    <item name="tv_float_tele_v2_status" type="id"/>
+    <item name="tv_notif_status" type="id"/>
+    <item name="tv_selected_app" type="id"/>
+    <item name="tv_status" type="id"/>
+    <item name="tv_storage_status" type="id"/>
+    <item name="tv_tele_replay_delay_value" type="id"/>
+    <item name="tv_tele_speed_burst_value" type="id"/>
+    <item name="tv_tele_speed_catchup_status" type="id"/>
+    <item name="tv_tele_speed_sleep_value" type="id"/>
+    <item name="tv_vpn_status" type="id"/>
+    <string name="activate_engine">KÍCH HOẠT ENGINE</string>
+    <string name="app_name">SunnyMod - Fake Lag</string>
+    <string name="checking">Đang kiểm tra…</string>
+    <string name="creator">Phát triển bởi SunnyMod</string>
+    <string name="deactivate_engine">NGỪNG KÍCH HOẠT</string>
+    <string name="delay_ping">DELAY PING</string>
+    <string name="engine_status_connected">ĐÃ KẾT NỐI</string>
+    <string name="engine_status_disconnected">ĐÃ NGẮT KẾT NỐI</string>
+    <string name="ff_max">FF MAX</string>
+    <string name="ff_normal">FF THƯỜNG</string>
+    <string name="floating_alpha">ĐỘ TRONG SUỐT NÚT TRÒN</string>
+    <string name="floating_alpha_applied">Thay đổi trực tiếp khi đang hiển thị</string>
+    <string name="floating_alpha_hint">Giảm hoặc tăng độ rõ của nút nổi ngay khi đang bật overlay.</string>
+    <string name="floating_hidden">Đang ẩn</string>
+    <string name="floating_size">KÍCH CỠ NÚT TRÒN</string>
+    <string name="floating_size_applied">Áp dụng theo thời gian thực</string>
+    <string name="floating_size_hint">Điều chỉnh kích thước hiển thị của các nút tròn trên màn hình.</string>
+    <string name="floating_visible">Đang hiển thị</string>
+    <string name="freeze">ĐÓNG BĂNG</string>
+    <string name="ghost">TÀNG HÌNH</string>
+    <string name="match_mask">CHE MÃ TRẬN</string>
+    <string name="match_mask_applied">Có thể kéo tự do, giữ 2 giây để khóa vị trí</string>
+    <string name="match_mask_length">ĐỘ DÀI THANH</string>
+    <string name="match_mask_length_hint">Chỉnh chiều dài của thanh trắng theo thời gian thực.</string>
+    <string name="match_mask_thickness">ĐỘ DÀY THANH</string>
+    <string name="match_mask_thickness_hint">Chỉnh độ dày của thanh trắng theo thời gian thực.</string>
+    <string name="permission_granted">Đã cấp</string>
+    <string name="permission_not_granted">Chưa cấp</string>
+    <string name="pos_locked">Đã khóa vị trí</string>
+    <string name="pos_unlocked">Đã mở khóa vị trí</string>
+    <string name="select_target_app">CHỌN APP TỰ DO</string>
+    <string name="target_awaiting">ĐANG CHỜ CHỌN MỤC TIÊU…</string>
+    <string name="tele">DỊCH CHUYỂN</string>
+    <string name="tele_speed">DỊCH CHUYỂN SPEED</string>
+    <string name="tele_v2">TÀNG HÌNH V2</string>
+    <string name="toast_choose_app">Vui lòng chọn ứng dụng mục tiêu!</string>
+    <style name="AppTheme" parent="@android:style/Theme.Holo">
+        <item name="android:colorBackground">#ff0d1117</item>
+        <item name="android:windowBackground">#ff0d1117</item>
+    </style>
+    <style name="ModernSwitch">
+        <item name="android:layout_width">54dp</item>
+        <item name="android:layout_height">28dp</item>
+        <item name="android:minWidth">54dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@drawable/bg_switch_custom_off</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+    <style name="ModernSwitchSmall">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">22dp</item>
+        <item name="android:minWidth">42dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:background">@drawable/bg_switch_custom_off</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>
