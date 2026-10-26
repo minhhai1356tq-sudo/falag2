@@ -69,5 +69,11 @@
             </intent-filter>
         </service>
 
+        <!-- Khai báo Service chạy ngầm để check trạng thái Ban/Kick -->
+        <service
+            android:name="com.fakelag.cryhard8.BackgroundCheckService"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 </manifest>
