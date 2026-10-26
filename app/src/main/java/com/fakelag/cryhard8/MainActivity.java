@@ -145,7 +145,8 @@ public class MainActivity extends Activity {
         public void onReceive(final Context context, Intent intent) {
             if (intent == null) return;
             String reason = intent.getStringExtra("reason");
-            if ("BANNED".equals(reason) || "KICKED".equals(reason)) {
+            if ("BANNED".equals(reason)) {
+                // Bị Ban: Hiện thông báo và thoát App
                 try {
                     Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
                     vpnStop.setAction("com.fakelag.cryhard8.STOP");
@@ -156,6 +157,24 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         showBlacklistScreen(reason);
+                    }
+                });
+            } else if ("KICKED".equals(reason)) {
+                // Bị Kick: Tắt VPN, tắt nút nổi, xóa trạng thái và về màn hình nhập Key
+                try {
+                    Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
+                    vpnStop.setAction("com.fakelag.cryhard8.STOP");
+                    startService(vpnStop);
+                } catch (Exception e) {}
+                try { stopService(new Intent(MainActivity.this, FloatingOverlayService.class)); } catch (Exception e) {}
+                
+                KeyManager.logout(MainActivity.this);
+                
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Phiên đăng nhập hết hạn. Vui lòng nhập lại Key!", Toast.LENGTH_LONG).show();
+                        recreate(); // Khởi động lại Activity để hiện Dialog nhập Key
                     }
                 });
             }
