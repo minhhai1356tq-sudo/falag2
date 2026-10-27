@@ -142,12 +142,27 @@ public class MainActivity extends Activity {
 
     // HÀM TẮT VPN VÀ NÚT NỔI (DÙNG CHUNG)
     private void stopAllServices() {
+        // 1. Tắt Nút nổi
+        try {
+            stopService(new Intent(MainActivity.this, FloatingOverlayService.class));
+        } catch (Exception e) {}
+
+        // 2. Tắt VPN (dùng stopService trực tiếp)
+        try {
+            stopService(new Intent(MainActivity.this, PacketVpnService.class));
+        } catch (Exception e) {}
+
+        // 3. Gửi thêm intent STOP phòng trường hợp service không tắt ngay
         try {
             Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
             vpnStop.setAction("com.fakelag.cryhard8.STOP");
             startService(vpnStop);
         } catch (Exception e) {}
-        try { stopService(new Intent(MainActivity.this, FloatingOverlayService.class)); } catch (Exception e) {}
+
+        // 4. Tắt BackgroundCheckService
+        try {
+            stopService(new Intent(MainActivity.this, BackgroundCheckService.class));
+        } catch (Exception e) {}
     }
 
     private BroadcastReceiver killReceiver = new BroadcastReceiver() {
@@ -156,7 +171,7 @@ public class MainActivity extends Activity {
             if (intent == null) return;
             String reason = intent.getStringExtra("reason");
             if ("BANNED".equals(reason)) {
-                stopAllServices(); // Tắt VPN và nút nổi
+                stopAllServices();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -199,7 +214,7 @@ public class MainActivity extends Activity {
             @Override
             public void onResult(String status) {
                 if ("BANNED".equals(status)) {
-                    stopAllServices(); // Tắt VPN và nút nổi
+                    stopAllServices();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -207,7 +222,7 @@ public class MainActivity extends Activity {
                         }
                     });
                 } else if ("LOCKED".equals(status)) {
-                    stopAllServices(); // Tắt VPN và nút nổi
+                    stopAllServices();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -239,7 +254,7 @@ public class MainActivity extends Activity {
                                     if (getActionBar() != null) getActionBar().hide();
                                 } catch (Exception e) { }
 
-                                // Khởi tạo giao diện (giữ nguyên toàn bộ code gốc)
+                                // Khởi tạo giao diện
                                 btnEngine   = findViewById(R.id.btn_engine);
                                 ivEnginePower = (ImageView) findViewById(R.id.iv_engine_power);
                                 tvApp       = (TextView) findViewById(R.id.tv_selected_app);
@@ -400,7 +415,7 @@ public class MainActivity extends Activity {
 
     // CÁC HÀM CÒN LẠI GIỮ NGUYÊN 100%
     private void showLockScreen(String reason) {
-        stopAllServices(); // Đảm bảo tắt VPN và nút nổi
+        stopAllServices();
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
