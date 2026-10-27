@@ -165,7 +165,7 @@ public class MainActivity extends Activity {
             public void run() {
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
-        }, 500);
+        }, 6000);
     }
 
     private BroadcastReceiver killReceiver = new BroadcastReceiver() {
