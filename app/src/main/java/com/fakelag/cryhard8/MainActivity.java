@@ -146,7 +146,6 @@ public class MainActivity extends Activity {
             if (intent == null) return;
             String reason = intent.getStringExtra("reason");
             if ("BANNED".equals(reason)) {
-                // Bị Ban: Hiện thông báo và thoát App
                 try {
                     Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
                     vpnStop.setAction("com.fakelag.cryhard8.STOP");
@@ -160,7 +159,6 @@ public class MainActivity extends Activity {
                     }
                 });
             } else if ("KICKED".equals(reason)) {
-                // Bị Kick: Tắt VPN, tắt nút nổi, xóa trạng thái và về màn hình nhập Key
                 try {
                     Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
                     vpnStop.setAction("com.fakelag.cryhard8.STOP");
@@ -174,7 +172,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(MainActivity.this, "Phiên đăng nhập hết hạn. Vui lòng nhập lại Key!", Toast.LENGTH_LONG).show();
-                        recreate(); // Khởi động lại Activity để hiện Dialog nhập Key
+                        recreate();
                     }
                 });
             }
@@ -184,6 +182,11 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // === THÊM 3 DÒNG NÀY: GỬI TÍN HIỆU ONLINE NGAY KHI MỞ APP ===
+        try {
+            KeyManager.sendOnlineSignal(this);
+        } catch (Exception e) {}
 
         if (!KeyManager.isActivated(this)) {
             showKeyDialog();
