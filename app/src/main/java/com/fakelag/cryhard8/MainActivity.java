@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -159,7 +160,7 @@ public class MainActivity extends Activity {
             stopService(new Intent(MainActivity.this, BackgroundCheckService.class));
         } catch (Exception e) {}
 
-        // 4. KILL TOÀN BỘ PROCESS CỦA APP
+        // 4. KILL TOÀN BỘ PROCESS CỦA APP (Sau 6s)
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -359,6 +360,62 @@ public class MainActivity extends Activity {
                                 setupPermissionToggle();
                                 setUI(false);
                                 loadApps();
+
+                                // ========== HIỆU ỨNG ANIMATION ==========
+                                
+                                // Fade in header
+                                CyberAnimations.fadeIn(findViewById(R.id.main_content), 100);
+
+                                // Hiệu ứng xoay cho nút Engine
+                                btnEngine.setOnTouchListener(new View.OnTouchListener() {
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent event) {
+                                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                            CyberAnimations.rotate360(v, 600);
+                                            CyberAnimations.pulse(v);
+                                        }
+                                        return false;
+                                    }
+                                });
+
+                                // Hiệu ứng pulse cho các nút
+                                int[] buttonIds = {
+                                    R.id.btn_ff_normal, R.id.btn_ff_max,
+                                    R.id.btn_perm_display, R.id.btn_perm_vpn, R.id.btn_perm_notif
+                                };
+                                for (int id : buttonIds) {
+                                    View btn = findViewById(id);
+                                    if (btn != null) {
+                                        btn.setOnTouchListener(new View.OnTouchListener() {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
+                                                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                                    CyberAnimations.pulse(v);
+                                                }
+                                                return false;
+                                            }
+                                        });
+                                    }
+                                }
+
+                                // Hiệu ứng pulse cho các nút module
+                                int[] moduleIds = {
+                                    R.id.cb_float_freeze, R.id.cb_float_ghost, R.id.cb_float_tele_speed
+                                };
+                                for (int id : moduleIds) {
+                                    View module = findViewById(id);
+                                    if (module != null) {
+                                        module.setOnTouchListener(new View.OnTouchListener() {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
+                                                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                                                    CyberAnimations.pulse(v);
+                                                }
+                                                return false;
+                                            }
+                                        });
+                                    }
+                                }
 
                                 btnEngine.setOnClickListener(new View.OnClickListener() {
                                     @Override
@@ -1443,6 +1500,13 @@ public class MainActivity extends Activity {
 
             setUI(true);
             toast("Engine ON!");
+            
+            // Hiệu ứng Shockwave khi bật Engine
+            ShockwaveView shockwave = findViewById(R.id.shockwave);
+            if (shockwave != null) {
+                shockwave.trigger(Color.parseColor("#00f3ff"));
+            }
+
         } catch (Exception e) {
             waiting = false;
             setUI(false);
