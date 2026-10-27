@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -155,7 +156,7 @@ public class MainActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        showBlacklistScreen(reason);
+                        showLockScreen("BANNED");
                     }
                 });
             } else if ("KICKED".equals(reason)) {
@@ -172,7 +173,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(MainActivity.this, "Phiên đăng nhập hết hạn. Vui lòng nhập lại Key!", Toast.LENGTH_LONG).show();
-                        recreate();
+                        recreate(); // Khởi động lại Activity để hiện Dialog nhập Key
                     }
                 });
             }
@@ -183,10 +184,17 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // === THÊM 3 DÒNG NÀY: GỬI TÍN HIỆU ONLINE NGAY KHI MỞ APP ===
+        // GỬI TÍN HIỆU ONLINE NGAY KHI MỞ APP
         try {
             KeyManager.sendOnlineSignal(this);
         } catch (Exception e) {}
+
+        // KIỂM TRA TRẠNG THÁI BAN TỪ BỘ NHỚ
+        boolean isBanned = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("is_banned", false);
+        if (isBanned) {
+            showLockScreen("BANNED");
+            return;
+        }
 
         if (!KeyManager.isActivated(this)) {
             showKeyDialog();
@@ -363,126 +371,48 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void showBlacklistScreen(String reason) {
-        final TextView tv = new TextView(this);
-        tv.setText(reason.equals("BANNED") ? "MÁY BẠN ĐÃ BỊ BACKLIST\nVUI LÒNG LIÊN HỆ ADMIN ĐỂ ĐƯỢC HỖ TRỢ" : "PHIÊN ĐĂNG NHẬP ĐÃ HẾT HẠN\nVUI LÒNG NHẬP LẠI KEY");
-        tv.setTextColor(Color.RED);
-        tv.setTextSize(24);
-        tv.setGravity(Gravity.CENTER);
-        tv.setBackgroundColor(Color.BLACK);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
-        
-        final WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        int type = (Build.VERSION.SDK_INT >= 26) ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            type,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
-            android.graphics.PixelFormat.OPAQUE
-        );
-        try {
-            wm.addView(tv, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+    // HÀM HIỂN THỊ MÀN HÌNH KHÓA MỚI (NẰM TRONG APP)
+    private void showLockScreen(String reason) {
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setGravity(Gravity.CENTER);
+        layout.setBackgroundColor(Color.BLACK);
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(android.R.drawable.ic_lock_lock); 
+        icon.setColorFilter(Color.RED);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(150, 150);
+        iconParams.bottomMargin = 30;
+        layout.addView(icon, iconParams);
+
+        TextView title = new TextView(this);
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(22);
+        title.setTypeface(null, Typeface.BOLD);
+        title.setGravity(Gravity.CENTER);
+
+        TextView desc = new TextView(this);
+        desc.setTextColor(Color.parseColor("#AAAAAA"));
+        desc.setTextSize(14);
+        desc.setGravity(Gravity.CENTER);
+        desc.setPadding(0, 20, 0, 0);
+
+        if ("LOCKED".equals(reason)) {
+            title.setText("Ứng dụng đang cập nhật");
+            desc.setText("FakeLag đang update vui lòng xóa phiên bản cũ và tải phiên bản mới nhất");
+        } else {
+            title.setText("Thiết bị này đã bị khóa");
+            desc.setText("Liên hệ hỗ trợ nếu bạn cho rằng đây là nhầm lẫn.");
         }
-        
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    wm.removeView(tv);
-                } catch (Exception e) {}
-                finishAffinity(); 
-                System.exit(0);
-            }
-        }, 30000);
-    }
 
-    private void showKeyDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("KÍCH HOẠT KEY");
-        builder.setCancelable(false);
-        builder.setMessage("Vui lòng nhập Key để sử dụng ứng dụng.");
+        layout.addView(title);
+        layout.addView(desc);
 
-        final android.widget.EditText input = new android.widget.EditText(this);
-        input.setHint("Nhập Key tại đây...");
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 20, 50, 20);
-        layout.addView(input);
-        
-        final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(this);
-        progressBar.setVisibility(View.GONE);
-        layout.addView(progressBar);
-        
-        builder.setView(layout);
+        setContentView(layout);
 
-        final AlertDialog dialog = builder.create();
-
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "KÍCH HOẠT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface d, int which) {
-            }
-        });
-        
-        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "THOÁT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface d, int which) {
-                finish();
-            }
-        });
-
-        dialog.show();
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String key = input.getText().toString().trim();
-                if (key.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Vui lòng nhập Key!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                progressBar.setVisibility(View.VISIBLE);
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-
-                KeyManager.checkKeyOnline(MainActivity.this, key, new KeyManager.KeyCallback() {
-                    @Override
-                    public void onResult(final boolean success, final String message) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressBar.setVisibility(View.GONE);
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
-
-                                if (success) {
-                                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-                                    dialog.dismiss();
-                                    recreate(); 
-                                } else {
-                                    if (message.startsWith("UPDATE|")) {
-                                        String updateMsg = message.replace("UPDATE|", "");
-                                        new AlertDialog.Builder(MainActivity.this)
-                                            .setTitle("CẬP NHẬT PHIÊN BẢN")
-                                            .setMessage(updateMsg)
-                                            .setCancelable(false)
-                                            .setPositiveButton("THOÁT", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface d, int w) {
-                                                    finish();
-                                                }
-                                            }).show();
-                                    } else {
-                                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        });
+        if ("BANNED".equals(reason)) {
+            getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean("is_banned", true).apply();
+        }
     }
 
     // CÁC HÀM CŨ CỦA BẠN GIỮ NGUYÊN TỪ ĐÂY
