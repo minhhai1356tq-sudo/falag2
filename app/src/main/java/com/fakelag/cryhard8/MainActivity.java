@@ -140,29 +140,32 @@ public class MainActivity extends Activity {
     private ViewGroup mainContent;
     private View groupMaskOptions, groupTeleOptions, groupTeleSpeedOptions;
 
-    // HÀM TẮT VPN VÀ NÚT NỔI (DÙNG CHUNG)
+    // HÀM TẮT VPN VÀ NÚT NỔI (DÙNG CHUNG) - KILL TOÀN BỘ PROCESS
     private void stopAllServices() {
         // 1. Tắt Nút nổi
         try {
             stopService(new Intent(MainActivity.this, FloatingOverlayService.class));
         } catch (Exception e) {}
 
-        // 2. Tắt VPN (dùng stopService trực tiếp)
-        try {
-            stopService(new Intent(MainActivity.this, PacketVpnService.class));
-        } catch (Exception e) {}
-
-        // 3. Gửi thêm intent STOP phòng trường hợp service không tắt ngay
+        // 2. Tắt VPN - Gửi lệnh STOP
         try {
             Intent vpnStop = new Intent(MainActivity.this, PacketVpnService.class);
             vpnStop.setAction("com.fakelag.cryhard8.STOP");
             startService(vpnStop);
         } catch (Exception e) {}
 
-        // 4. Tắt BackgroundCheckService
+        // 3. Tắt BackgroundCheckService
         try {
             stopService(new Intent(MainActivity.this, BackgroundCheckService.class));
         } catch (Exception e) {}
+
+        // 4. KILL TOÀN BỘ PROCESS CỦA APP
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                android.os.Process.killProcess(android.os.Process.myPid());
+            }
+        }, 500);
     }
 
     private BroadcastReceiver killReceiver = new BroadcastReceiver() {
