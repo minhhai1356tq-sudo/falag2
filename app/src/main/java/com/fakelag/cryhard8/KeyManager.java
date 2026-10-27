@@ -152,7 +152,6 @@ public class KeyManager {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).getBoolean(KEY_ACTIVATED, false);
     }
 
-    // === HÀM MỚI: Xóa trạng thái kích hoạt (Dùng khi bị Kick) ===
     public static void logout(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putBoolean(KEY_ACTIVATED, false).remove("saved_key").apply();
