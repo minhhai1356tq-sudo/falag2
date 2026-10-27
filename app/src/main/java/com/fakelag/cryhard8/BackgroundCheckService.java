@@ -20,19 +20,16 @@ public class BackgroundCheckService extends Service {
                 String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
                 while (isRunning) {
                     try {
-                        // Chờ 10 giây trước khi check lại
                         Thread.sleep(10000); 
                         
                         KeyManager.checkStatusSilent(getApplicationContext(), deviceId, new KeyManager.StatusCallback() {
                             @Override
                             public void onResult(String status) {
                                 if ("BANNED".equals(status) || "KICKED".equals(status)) {
-                                    // Nếu bị Ban hoặc Kick, gửi Broadcast yêu cầu tắt App
                                     Intent intent = new Intent("com.fakelag.cryhard8.KILL_APP");
                                     intent.putExtra("reason", status);
                                     sendBroadcast(intent);
                                     
-                                    // Dừng Service
                                     isRunning = false;
                                     stopSelf();
                                 }
