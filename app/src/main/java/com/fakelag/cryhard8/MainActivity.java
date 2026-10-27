@@ -1500,12 +1500,17 @@ public class MainActivity extends Activity {
 
             setUI(true);
             toast("Engine ON!");
-            
-            // Hiệu ứng Shockwave khi bật Engine
-            ShockwaveView shockwave = findViewById(R.id.shockwave);
-            if (shockwave != null) {
-                shockwave.trigger(Color.parseColor("#00f3ff"));
-            }
+
+            // [ĐÃ SỬA] Hiệu ứng Shockwave khi bật Engine - dùng getIdentifier để không phụ thuộc R.id.shockwave
+            try {
+                int shockId = getResources().getIdentifier("shockwave", "id", getPackageName());
+                if (shockId != 0) {
+                    View shockView = findViewById(shockId);
+                    if (shockView instanceof ShockwaveView) {
+                        ((ShockwaveView) shockView).trigger(Color.parseColor("#00f3ff"));
+                    }
+                }
+            } catch (Exception ignored) { }
 
         } catch (Exception e) {
             waiting = false;
