@@ -140,7 +140,6 @@ public class MainActivity extends Activity {
     private ViewGroup mainContent;
     private View groupMaskOptions, groupTeleOptions, groupTeleSpeedOptions;
 
-    // THÊM BIẾN NHẬN TÍN HIỆU TẮT APP
     private BroadcastReceiver killReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
@@ -173,7 +172,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(MainActivity.this, "Phiên đăng nhập hết hạn. Vui lòng nhập lại Key!", Toast.LENGTH_LONG).show();
-                        recreate(); // Khởi động lại Activity để hiện Dialog nhập Key
+                        recreate();
                     }
                 });
             }
@@ -189,189 +188,212 @@ public class MainActivity extends Activity {
             KeyManager.sendOnlineSignal(this);
         } catch (Exception e) {}
 
-        // KIỂM TRA TRẠNG THÁI BAN TỪ BỘ NHỚ
-        boolean isBanned = getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("is_banned", false);
-        if (isBanned) {
-            showLockScreen("BANNED");
-            return;
-        }
-
-        if (!KeyManager.isActivated(this)) {
-            showKeyDialog();
-            return; 
-        }
-
-        setContentView(R.layout.activity_main);
-
-        try {
-            Intent serviceIntent = new Intent(this, BackgroundCheckService.class);
-            startService(serviceIntent);
-        } catch (Exception e) { }
-
-        IntentFilter filter = new IntentFilter("com.fakelag.cryhard8.KILL_APP");
-        if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(killReceiver, filter, Context.RECEIVER_EXPORTED);
-        } else {
-            registerReceiver(killReceiver, filter);
-        }
-
-        try {
-            if (getActionBar() != null) getActionBar().hide();
-        } catch (Exception e) { }
-
-        btnEngine   = findViewById(R.id.btn_engine);
-        ivEnginePower = (ImageView) findViewById(R.id.iv_engine_power);
-        tvApp       = (TextView) findViewById(R.id.tv_selected_app);
-        tvStatus    = (TextView) findViewById(R.id.tv_status);
-        dotEngine   = findViewById(R.id.dot_engine);
-        dotApp      = findViewById(R.id.dot_app);
-        final Button btnShowFloating = (Button) findViewById(R.id.btn_show_floating);
-        final Button btnFfNormal = (Button) findViewById(R.id.btn_ff_normal);
-        final Button btnFfMax = (Button) findViewById(R.id.btn_ff_max);
-        mainContent = (ViewGroup) findViewById(R.id.main_content);
-        groupMaskOptions = findViewById(R.id.group_mask_options);
-        groupTeleOptions = findViewById(R.id.group_tele_options);
-        groupTeleSpeedOptions = findViewById(R.id.group_tele_speed_options);
-
-        cbFloatGhost      = (TextView) findViewById(R.id.cb_float_ghost);
-        cbFloatFreeze     = (TextView) findViewById(R.id.cb_float_freeze);
-        cbFloatTele       = (TextView) findViewById(R.id.cb_float_tele);
-        cbFloatTeleV2     = (TextView) findViewById(R.id.cb_float_tele_v2);
-        cbFloatDelayPing  = (TextView) findViewById(R.id.cb_float_delay_ping);
-        cbFloatTeleSpeed  = (TextView) findViewById(R.id.cb_float_tele_speed);
-        tvFloatGhostStatus   = (TextView) findViewById(R.id.tv_float_ghost_status);
-        tvFloatFreezeStatus  = (TextView) findViewById(R.id.tv_float_freeze_status);
-        tvFloatTeleStatus    = (TextView) findViewById(R.id.tv_float_tele_status);
-        tvFloatTeleV2Status  = (TextView) findViewById(R.id.tv_float_tele_v2_status);
-        tvFloatDelayPingStatus = (TextView) findViewById(R.id.tv_float_delay_ping_status);
-        tvFloatTeleSpeedStatus = (TextView) findViewById(R.id.tv_float_tele_speed_status);
-        cbAutoStopTele       = (TextView) findViewById(R.id.cb_auto_stop_tele);
-        tvAutoStopTeleStatus = (TextView) findViewById(R.id.tv_auto_stop_tele_status);
-        cbMaskBar            = (TextView) findViewById(R.id.cb_mask_bar);
-        tvMaskBarStatus      = (TextView) findViewById(R.id.tv_mask_bar_status);
-        cbDevMode            = (TextView) findViewById(R.id.cb_dev_mode);
-        tvDevModeStatus      = (TextView) findViewById(R.id.tv_dev_mode_status);
-        cbCrosshair          = (TextView) findViewById(R.id.cb_crosshair);
-        tvCrosshairStatus    = (TextView) findViewById(R.id.tv_crosshair_status);
-
-        dotVpn     = findViewById(R.id.dot_vpn);
-        dotDisplay = findViewById(R.id.dot_display);
-        dotNotif   = findViewById(R.id.dot_notif);
-        dotStorage = findViewById(R.id.dot_storage);
-        tvVpnStatus     = (TextView) findViewById(R.id.tv_vpn_status);
-        tvDisplayStatus = (TextView) findViewById(R.id.tv_display_status);
-        tvNotifStatus   = (TextView) findViewById(R.id.tv_notif_status);
-        tvStorageStatus = (TextView) findViewById(R.id.tv_storage_status);
-        cbVpn     = (TextView) findViewById(R.id.cb_vpn);
-        cbDisplay = (TextView) findViewById(R.id.cb_display);
-        cbNotif   = (TextView) findViewById(R.id.cb_notif);
-        cbStorage = (TextView) findViewById(R.id.cb_storage);
-        tvFloatSizeValue = (TextView) findViewById(R.id.tv_float_size_value);
-        tvFloatAlphaValue = (TextView) findViewById(R.id.tv_float_alpha_value);
-        tvMaskBarThicknessValue = (TextView) findViewById(R.id.tv_mask_bar_thickness_value);
-        tvMaskBarLengthValue = (TextView) findViewById(R.id.tv_mask_bar_length_value);
-        tvTeleReplayDelayValue = (TextView) findViewById(R.id.tv_tele_replay_delay_value);
-        tvTeleSpeedBurstValue = (TextView) findViewById(R.id.tv_tele_speed_burst_value);
-        tvTeleSpeedSleepValue = (TextView) findViewById(R.id.tv_tele_speed_sleep_value);
-        tvTeleSpeedCatchupStatus = (TextView) findViewById(R.id.tv_tele_speed_catchup_status);
-        cbTeleSpeedCatchup = (TextView) findViewById(R.id.cb_tele_speed_catchup);
-        seekFloatSize = (SeekBar) findViewById(R.id.seek_float_size);
-        seekFloatAlpha = (SeekBar) findViewById(R.id.seek_float_alpha);
-        seekMaskBarThickness = (SeekBar) findViewById(R.id.seek_mask_bar_thickness);
-        seekMaskBarLength = (SeekBar) findViewById(R.id.seek_mask_bar_length);
-        seekTeleReplayDelay = (SeekBar) findViewById(R.id.seek_tele_replay_delay);
-        seekTeleSpeedBurst = (SeekBar) findViewById(R.id.seek_tele_speed_burst);
-        seekTeleSpeedSleep = (SeekBar) findViewById(R.id.seek_tele_speed_sleep);
-        tvCrosshairSizeValue = (TextView) findViewById(R.id.tv_crosshair_size_value);
-        tvCrosshairAlphaValue = (TextView) findViewById(R.id.tv_crosshair_alpha_value);
-        seekCrosshairSize = (SeekBar) findViewById(R.id.seek_crosshair_size);
-        seekCrosshairAlpha = (SeekBar) findViewById(R.id.seek_crosshair_alpha);
-        crosshairStyleButtons = new TextView[]{
-                (TextView) findViewById(R.id.crosshair_style_dot),
-                (TextView) findViewById(R.id.crosshair_style_cross),
-                (TextView) findViewById(R.id.crosshair_style_ring),
-                (TextView) findViewById(R.id.crosshair_style_dot_ring),
-                (TextView) findViewById(R.id.crosshair_style_sniper),
-                (TextView) findViewById(R.id.crosshair_style_dynamic),
-                (TextView) findViewById(R.id.crosshair_style_minimal),
-                (TextView) findViewById(R.id.crosshair_style_custom)
-        };
-        crosshairColorButtons = new View[]{
-                findViewById(R.id.crosshair_color_cyan),
-                findViewById(R.id.crosshair_color_green),
-                findViewById(R.id.crosshair_color_yellow),
-                findViewById(R.id.crosshair_color_orange),
-                findViewById(R.id.crosshair_color_red),
-                findViewById(R.id.crosshair_color_pink),
-                findViewById(R.id.crosshair_color_purple),
-                findViewById(R.id.crosshair_color_white),
-                findViewById(R.id.crosshair_color_black)
-        };
-
-        setupFloatingToggle(cbFloatFreeze,  tvFloatFreezeStatus,  KEY_FREEZE);
-        setupFloatingToggle(cbFloatTeleV2,  tvFloatTeleV2Status,  KEY_GHOST);
-        setupFloatingToggle(cbFloatTeleSpeed, tvFloatTeleSpeedStatus, KEY_TELE_SPEED);
-        setupFloatSizeSeek();
-        setupFloatAlphaSeek();
-        setupCrosshairControls();
-        updateConditionalGroups(false);
-        animateMainEntrance();
-
-        setupPermissionToggle();
-        setUI(false);
-        loadApps();
-
-        btnEngine.setOnClickListener(new View.OnClickListener() {
+        // === SỬA: LUÔN KIỂM TRA LẠI SERVER KHI MỞ APP ===
+        String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        KeyManager.checkStatusSilent(this, deviceId, new KeyManager.StatusCallback() {
             @Override
-            public void onClick(View v) {
-                if (waiting) return;
-                if (!engineOn) {
-                    if (selPkg == null) {
-                        toast(getString(R.string.toast_choose_app));
-                        return;
-                    }
-                    checkOverlay();
+            public void onResult(String status) {
+                if ("BANNED".equals(status)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showLockScreen("BANNED");
+                        }
+                    });
+                } else if ("LOCKED".equals(status)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showLockScreen("LOCKED");
+                        }
+                    });
                 } else {
-                    stopEngine();
+                    // Đã được gỡ ban -> Xóa trạng thái is_banned (nếu có) và tiếp tục
+                    getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean("is_banned", false).apply();
+                    
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!KeyManager.isActivated(MainActivity.this)) {
+                                showKeyDialog();
+                            } else {
+                                setContentView(R.layout.activity_main);
+                                try {
+                                    Intent serviceIntent = new Intent(MainActivity.this, BackgroundCheckService.class);
+                                    startService(serviceIntent);
+                                } catch (Exception e) { }
+
+                                IntentFilter filter = new IntentFilter("com.fakelag.cryhard8.KILL_APP");
+                                if (Build.VERSION.SDK_INT >= 33) {
+                                    registerReceiver(killReceiver, filter, Context.RECEIVER_EXPORTED);
+                                } else {
+                                    registerReceiver(killReceiver, filter);
+                                }
+
+                                try {
+                                    if (getActionBar() != null) getActionBar().hide();
+                                } catch (Exception e) { }
+
+                                // Khởi tạo giao diện
+                                btnEngine   = findViewById(R.id.btn_engine);
+                                ivEnginePower = (ImageView) findViewById(R.id.iv_engine_power);
+                                tvApp       = (TextView) findViewById(R.id.tv_selected_app);
+                                tvStatus    = (TextView) findViewById(R.id.tv_status);
+                                dotEngine   = findViewById(R.id.dot_engine);
+                                dotApp      = findViewById(R.id.dot_app);
+                                final Button btnShowFloating = (Button) findViewById(R.id.btn_show_floating);
+                                final Button btnFfNormal = (Button) findViewById(R.id.btn_ff_normal);
+                                final Button btnFfMax = (Button) findViewById(R.id.btn_ff_max);
+                                mainContent = (ViewGroup) findViewById(R.id.main_content);
+                                groupMaskOptions = findViewById(R.id.group_mask_options);
+                                groupTeleOptions = findViewById(R.id.group_tele_options);
+                                groupTeleSpeedOptions = findViewById(R.id.group_tele_speed_options);
+
+                                cbFloatGhost      = (TextView) findViewById(R.id.cb_float_ghost);
+                                cbFloatFreeze     = (TextView) findViewById(R.id.cb_float_freeze);
+                                cbFloatTele       = (TextView) findViewById(R.id.cb_float_tele);
+                                cbFloatTeleV2     = (TextView) findViewById(R.id.cb_float_tele_v2);
+                                cbFloatDelayPing  = (TextView) findViewById(R.id.cb_float_delay_ping);
+                                cbFloatTeleSpeed  = (TextView) findViewById(R.id.cb_float_tele_speed);
+                                tvFloatGhostStatus   = (TextView) findViewById(R.id.tv_float_ghost_status);
+                                tvFloatFreezeStatus  = (TextView) findViewById(R.id.tv_float_freeze_status);
+                                tvFloatTeleStatus    = (TextView) findViewById(R.id.tv_float_tele_status);
+                                tvFloatTeleV2Status  = (TextView) findViewById(R.id.tv_float_tele_v2_status);
+                                tvFloatDelayPingStatus = (TextView) findViewById(R.id.tv_float_delay_ping_status);
+                                tvFloatTeleSpeedStatus = (TextView) findViewById(R.id.tv_float_tele_speed_status);
+                                cbAutoStopTele       = (TextView) findViewById(R.id.cb_auto_stop_tele);
+                                tvAutoStopTeleStatus = (TextView) findViewById(R.id.tv_auto_stop_tele_status);
+                                cbMaskBar            = (TextView) findViewById(R.id.cb_mask_bar);
+                                tvMaskBarStatus      = (TextView) findViewById(R.id.tv_mask_bar_status);
+                                cbDevMode            = (TextView) findViewById(R.id.cb_dev_mode);
+                                tvDevModeStatus      = (TextView) findViewById(R.id.tv_dev_mode_status);
+                                cbCrosshair          = (TextView) findViewById(R.id.cb_crosshair);
+                                tvCrosshairStatus    = (TextView) findViewById(R.id.tv_crosshair_status);
+
+                                dotVpn     = findViewById(R.id.dot_vpn);
+                                dotDisplay = findViewById(R.id.dot_display);
+                                dotNotif   = findViewById(R.id.dot_notif);
+                                dotStorage = findViewById(R.id.dot_storage);
+                                tvVpnStatus     = (TextView) findViewById(R.id.tv_vpn_status);
+                                tvDisplayStatus = (TextView) findViewById(R.id.tv_display_status);
+                                tvNotifStatus   = (TextView) findViewById(R.id.tv_notif_status);
+                                tvStorageStatus = (TextView) findViewById(R.id.tv_storage_status);
+                                cbVpn     = (TextView) findViewById(R.id.cb_vpn);
+                                cbDisplay = (TextView) findViewById(R.id.cb_display);
+                                cbNotif   = (TextView) findViewById(R.id.cb_notif);
+                                cbStorage = (TextView) findViewById(R.id.cb_storage);
+                                tvFloatSizeValue = (TextView) findViewById(R.id.tv_float_size_value);
+                                tvFloatAlphaValue = (TextView) findViewById(R.id.tv_float_alpha_value);
+                                tvMaskBarThicknessValue = (TextView) findViewById(R.id.tv_mask_bar_thickness_value);
+                                tvMaskBarLengthValue = (TextView) findViewById(R.id.tv_mask_bar_length_value);
+                                tvTeleReplayDelayValue = (TextView) findViewById(R.id.tv_tele_replay_delay_value);
+                                tvTeleSpeedBurstValue = (TextView) findViewById(R.id.tv_tele_speed_burst_value);
+                                tvTeleSpeedSleepValue = (TextView) findViewById(R.id.tv_tele_speed_sleep_value);
+                                tvTeleSpeedCatchupStatus = (TextView) findViewById(R.id.tv_tele_speed_catchup_status);
+                                cbTeleSpeedCatchup = (TextView) findViewById(R.id.cb_tele_speed_catchup);
+                                seekFloatSize = (SeekBar) findViewById(R.id.seek_float_size);
+                                seekFloatAlpha = (SeekBar) findViewById(R.id.seek_float_alpha);
+                                seekMaskBarThickness = (SeekBar) findViewById(R.id.seek_mask_bar_thickness);
+                                seekMaskBarLength = (SeekBar) findViewById(R.id.seek_mask_bar_length);
+                                seekTeleReplayDelay = (SeekBar) findViewById(R.id.seek_tele_replay_delay);
+                                seekTeleSpeedBurst = (SeekBar) findViewById(R.id.seek_tele_speed_burst);
+                                seekTeleSpeedSleep = (SeekBar) findViewById(R.id.seek_tele_speed_sleep);
+                                tvCrosshairSizeValue = (TextView) findViewById(R.id.tv_crosshair_size_value);
+                                tvCrosshairAlphaValue = (TextView) findViewById(R.id.tv_crosshair_alpha_value);
+                                seekCrosshairSize = (SeekBar) findViewById(R.id.seek_crosshair_size);
+                                seekCrosshairAlpha = (SeekBar) findViewById(R.id.seek_crosshair_alpha);
+                                crosshairStyleButtons = new TextView[]{
+                                        (TextView) findViewById(R.id.crosshair_style_dot),
+                                        (TextView) findViewById(R.id.crosshair_style_cross),
+                                        (TextView) findViewById(R.id.crosshair_style_ring),
+                                        (TextView) findViewById(R.id.crosshair_style_dot_ring),
+                                        (TextView) findViewById(R.id.crosshair_style_sniper),
+                                        (TextView) findViewById(R.id.crosshair_style_dynamic),
+                                        (TextView) findViewById(R.id.crosshair_style_minimal),
+                                        (TextView) findViewById(R.id.crosshair_style_custom)
+                                };
+                                crosshairColorButtons = new View[]{
+                                        findViewById(R.id.crosshair_color_cyan),
+                                        findViewById(R.id.crosshair_color_green),
+                                        findViewById(R.id.crosshair_color_yellow),
+                                        findViewById(R.id.crosshair_color_orange),
+                                        findViewById(R.id.crosshair_color_red),
+                                        findViewById(R.id.crosshair_color_pink),
+                                        findViewById(R.id.crosshair_color_purple),
+                                        findViewById(R.id.crosshair_color_white),
+                                        findViewById(R.id.crosshair_color_black)
+                                };
+
+                                setupFloatingToggle(cbFloatFreeze,  tvFloatFreezeStatus,  KEY_FREEZE);
+                                setupFloatingToggle(cbFloatTeleV2,  tvFloatTeleV2Status,  KEY_GHOST);
+                                setupFloatingToggle(cbFloatTeleSpeed, tvFloatTeleSpeedStatus, KEY_TELE_SPEED);
+                                setupFloatSizeSeek();
+                                setupFloatAlphaSeek();
+                                setupCrosshairControls();
+                                updateConditionalGroups(false);
+                                animateMainEntrance();
+
+                                setupPermissionToggle();
+                                setUI(false);
+                                loadApps();
+
+                                btnEngine.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (waiting) return;
+                                        if (!engineOn) {
+                                            if (selPkg == null) {
+                                                toast(getString(R.string.toast_choose_app));
+                                                return;
+                                            }
+                                            checkOverlay();
+                                        } else {
+                                            stopEngine();
+                                        }
+                                    }
+                                });
+
+                                btnShowFloating.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (!loaded) {
+                                            toast(getString(R.string.checking));
+                                            return;
+                                        }
+                                        showPicker();
+                                    }
+                                });
+
+                                btnFfNormal.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        selPkg = "com.dts.freefireth";
+                                        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
+                                        tvApp.setText("ĐÃ CHỌN: FF THƯỜNG");
+                                        dotApp.setBackgroundResource(R.drawable.dot_on);
+                                        toast("Đã chọn Free Fire Thường");
+                                    }
+                                });
+
+                                btnFfMax.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        selPkg = "com.dts.freefiremax";
+                                        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
+                                        tvApp.setText("ĐÃ CHỌN: FF MAX");
+                                        dotApp.setBackgroundResource(R.drawable.dot_on);
+                                        toast("Đã chọn Free Fire MAX");
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
-            }
-        });
-
-        btnShowFloating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!loaded) {
-                    toast(getString(R.string.checking));
-                    return;
-                }
-                showPicker();
-            }
-        });
-
-        btnFfNormal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selPkg = "com.dts.freefireth";
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
-                tvApp.setText("ĐÃ CHỌN: FF THƯỜNG");
-                dotApp.setBackgroundResource(R.drawable.dot_on);
-                toast("Đã chọn Free Fire Thường");
-            }
-        });
-
-        btnFfMax.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selPkg = "com.dts.freefiremax";
-                getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_TARGET_PACKAGE, selPkg).commit();
-                tvApp.setText("ĐÃ CHỌN: FF MAX");
-                dotApp.setBackgroundResource(R.drawable.dot_on);
-                toast("Đã chọn Free Fire MAX");
             }
         });
     }
 
-    // HÀM HIỂN THỊ MÀN HÌNH KHÓA MỚI (NẰM TRONG APP)
+    // CÁC HÀM CÒN LẠI GIỮ NGUYÊN 100%
     private void showLockScreen(String reason) {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -415,7 +437,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    // THÊM LẠI HÀM showKeyDialog BỊ THIẾU
     private void showKeyDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("KÍCH HOẠT KEY");
@@ -502,7 +523,6 @@ public class MainActivity extends Activity {
         });
     }
 
-    // CÁC HÀM CŨ CỦA BẠN GIỮ NGUYÊN TỪ ĐÂY
     @Override
     protected void onResume() {
         super.onResume();
