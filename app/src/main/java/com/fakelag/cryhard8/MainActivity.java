@@ -415,6 +415,93 @@ public class MainActivity extends Activity {
         }
     }
 
+    // THÊM LẠI HÀM showKeyDialog BỊ THIẾU
+    private void showKeyDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("KÍCH HOẠT KEY");
+        builder.setCancelable(false);
+        builder.setMessage("Vui lòng nhập Key để sử dụng ứng dụng.");
+
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("Nhập Key tại đây...");
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 20, 50, 20);
+        layout.addView(input);
+        
+        final android.widget.ProgressBar progressBar = new android.widget.ProgressBar(this);
+        progressBar.setVisibility(View.GONE);
+        layout.addView(progressBar);
+        
+        builder.setView(layout);
+
+        final AlertDialog dialog = builder.create();
+
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "KÍCH HOẠT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface d, int which) {
+            }
+        });
+        
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "THOÁT", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface d, int which) {
+                finish();
+            }
+        });
+
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String key = input.getText().toString().trim();
+                if (key.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập Key!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                progressBar.setVisibility(View.VISIBLE);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+
+                KeyManager.checkKeyOnline(MainActivity.this, key, new KeyManager.KeyCallback() {
+                    @Override
+                    public void onResult(final boolean success, final String message) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+
+                                if (success) {
+                                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                    recreate(); 
+                                } else {
+                                    if (message.startsWith("UPDATE|")) {
+                                        String updateMsg = message.replace("UPDATE|", "");
+                                        new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("CẬP NHẬT PHIÊN BẢN")
+                                            .setMessage(updateMsg)
+                                            .setCancelable(false)
+                                            .setPositiveButton("THOÁT", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface d, int w) {
+                                                    finish();
+                                                }
+                                            }).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     // CÁC HÀM CŨ CỦA BẠN GIỮ NGUYÊN TỪ ĐÂY
     @Override
     protected void onResume() {
