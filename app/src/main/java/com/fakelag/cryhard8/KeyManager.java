@@ -31,7 +31,6 @@ public class KeyManager {
         void onResult(String status);
     }
 
-    // Hàm kiểm tra Key khi nhập vào (hiển thị Dialog)
     public static void checkKeyOnline(final Context context, final String keyCode, final KeyCallback callback) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(new Runnable() {
@@ -107,7 +106,6 @@ public class KeyManager {
         });
     }
 
-    // Hàm kiểm tra trạng thái ngầm (dành cho Background Service)
     public static void checkStatusSilent(final Context context, final String deviceId, final StatusCallback callback) {
         new Thread(new Runnable() {
             @Override
@@ -155,5 +153,41 @@ public class KeyManager {
     public static void logout(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         prefs.edit().putBoolean(KEY_ACTIVATED, false).remove("saved_key").apply();
+    }
+
+    // === HÀM MỚI: Gửi tín hiệu online ngay khi mở App ===
+    public static void sendOnlineSignal(final Context context) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection conn = null;
+                try {
+                    URL url = new URL(BASE_URL + "/api/check_status");
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setRequestProperty("X-App-Key", APP_SECRET);
+                    conn.setDoOutput(true);
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(10000);
+
+                    String deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                    JSONObject json = new JSONObject();
+                    json.put("device_id", deviceId);
+
+                    OutputStream os = conn.getOutputStream();
+                    os.write(json.toString().getBytes("UTF-8"));
+                    os.close();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    while (reader.readLine() != null) {}
+                    reader.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (conn != null) conn.disconnect();
+                }
+            }
+        }).start();
     }
 }
